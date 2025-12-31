@@ -213,6 +213,28 @@
             border-radius: 4px;
         }
 
+        /* Global scrollbar styling to ensure consistent dark appearance */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        /* Firefox */
+        html, body, #sidebar, #toc-sidebar, #slide-view {
+            scrollbar-width: thin;
+            scrollbar-color: #444 #1e1e1e;
+        }
+
+        /* Subtle sidebar separators: make them darker and less contrasty */
+        #sidebar { border-right: 1px solid rgba(255,255,255,0.03); }
+        #toc-sidebar { border-left: 1px solid rgba(255,255,255,0.03); }
+
         .preview-container {
             position: relative;
             border-radius: 50px;
@@ -626,6 +648,51 @@
 
         .slide-content > h1, .slide-content > h2, .slide-content > h3 { margin-top: 0; }
 
+        /* Keep images contained inside slides */
+        .slide-content img,
+        .slides-inner img,
+        .slide-inline img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 12px auto;
+            object-fit: contain;
+        }
+        /* Constrain very tall images so they fit inside overlay/inline slide scroll areas */
+        .slides-inner img { max-height: calc(80vh - 160px); }
+        .slide-inline img { max-height: calc(70vh - 160px); }
+
+        /* Responsive video embeds (YouTube) */
+        .video-embed {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            margin: 16px 0;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #000;
+        }
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        /* Constrain video height inside slide overlay */
+        .slides-inner .video-embed { max-height: calc(80vh - 160px); }
+        .slide-inline .video-embed { max-height: calc(70vh - 160px); }
+
+        .video-fallback {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.95em;
+            color: #9fbad8;
+        }
+        .video-fallback a { color: #58a6ff; text-decoration: underline; }
+
         .slide-controls {
             position: absolute;
             right: 12px;
@@ -744,6 +811,38 @@
             z-index: 10001;
         }
 
+/* Base hamburger styles (work at all sizes) */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 36px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            position: fixed;
+            top: 10px;
+            z-index: 3000;
+        }
+
+        .hamburger .bar {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 3px;
+            transition: transform 0.25s ease, opacity 0.2s ease, background 0.2s ease;
+        }
+
+        .hamburger.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+        .hamburger:focus { outline: 2px solid rgba(106,17,203,0.12); border-radius: 6px; }
+        .hamburger:hover .bar { background: linear-gradient(90deg, #6a11cb, #2575fc); }
+
         @media (max-width: 1200px) {
             #sidebar {
                 display: none;
@@ -761,23 +860,40 @@
                 display: block;
             }
 
-        /* CSS for both toggle buttons */
-        #toggle-md-files, #toc-toggle {
-            display: block;
-            background-color: transparent;
+        /* Hamburger toggle buttons (polished) */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 36px;
+            height: 24px;
+            background: transparent;
             border: none;
             cursor: pointer;
-            z-index: 3000;
+            padding: 4px;
             position: fixed;
             top: 10px;
+            z-index: 3000;
         }
-           #toggle-md-files div, #toc-toggle div {
-            width: 30px;
+
+        #toggle-md-files { left: 10px; }
+        #toc-toggle { right: 10px; }
+
+        .hamburger .bar {
+            display: block;
             height: 3px;
-            background-color: #ffffff;
-            margin: 5px 0;
-            transition: 0.4s;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 3px;
+            transition: transform 0.25s ease, opacity 0.2s ease;
         }
+
+        .hamburger.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .hamburger.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+        .hamburger:focus { outline: 2px solid rgba(106,17,203,0.12); border-radius: 6px; }
+        .hamburger:hover .bar { background: linear-gradient(90deg, #6a11cb, #2575fc); }
              
         }
   /* Position adjustments for each button */
@@ -850,19 +966,9 @@
     }
   
 
-    #toggle-md-files, #toc-toggle {
-        display: block;
-        position: fixed;
-        top: 10px;
-        z-index: 3000;
-    }
+    .hamburger { display: block; position: fixed; top: 10px; z-index: 3000; }
 
-    #toggle-md-files div,#toc-toggle div {
-        width: 20px;
-        height: 3px;
-        margin: 4px 0;
-        background-color: #ffffff;
-    }
+    .hamburger .bar { width: 20px; height: 3px; margin: 4px 0; }
 
      /* Position adjustments for each button */
         #toggle-md-files {
@@ -921,6 +1027,41 @@
         margin-bottom: 10px;
     }
 
+    /* File-specific action buttons (starter/final repos) */
+    .file-action-buttons {
+        margin: 10px 0 18px 0;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .file-action-button {
+        background: linear-gradient(90deg,#6a11cb,#2575fc);
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .file-action-button.secondary {
+        background: linear-gradient(90deg,#10b981,#06b6a4);
+    }
+    .file-action-button[aria-hidden="true"] { display: none; }
+
+    .file-action-download {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.06);
+        color: #d4d4d4;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 0.9em;
+        cursor: pointer;
+    }
+    .file-action-download:hover { background: rgba(255,255,255,0.03); }
+
     #preview ul {
         padding-left: 20px;
         margin-bottom: 10px;
@@ -930,14 +1071,179 @@
         margin-bottom: 5px;
     }
 }
+/* Compact download row */
+.download-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 18px 0;
+}
+
+.download-row span {
+    font-weight: 600;
+    color: #cfd6e0;
+}
+
+.download-btn {
+    background: linear-gradient(90deg,#6a11cb,#2575fc);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.download-btn.final {
+    background: linear-gradient(90deg,#10b981,#06b6a4);
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+}
+
+.download-row {
+    display: flex;
+    justify-content: flex-end; /* ✅ moves buttons to right */
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 18px;
+}
+.download-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 12px 0 20px;
+}
+.download-button-group {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.download-btn {
+    min-width: 140px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    color: #6a11cb;
+    background: #ffffff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+}
+
+.download-btn.final {
+    background: #1f1f1f;
+    color: #ffffff;
+}
+.download-button-group:empty {
+    display: none;
+}
+
+.page-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px; /* controls space below header */
+}
+
+.page-header-bar h1 {
+    margin: 0;            /* 🔥 removes huge default h1 gap */
+    line-height: 1.2;
+}
+
+.file-action-buttons {
+    margin: 0;            /* 🔥 prevents vertical push */
+    display: flex;
+    align-items: center;
+}
+.lesson-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 22px;
+    margin-bottom: 16px;
+
+    border-radius: 16px;
+    background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.06),
+        rgba(255,255,255,0.02)
+    );
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.lesson-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+
+    background: linear-gradient(90deg, #9b5cff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.file-action-buttons {
+    display: flex;
+    gap: 12px;
+}
+.download-btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
+
+    font-weight: 700;
+    font-size: 0.95rem;
+
+    cursor: pointer;
+    background: #ffffff;
+    color: #6a11cb;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.download-btn.final {
+    background: #1f1f1f;
+    color: #ffffff;
+}
+@media (max-width: 700px) {
+    .lesson-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .file-action-buttons {
+        align-self: flex-end;
+    }
+}
 
     </style>
 </head>
 <body>
-    <button id="toggle-md-files" style="position: fixed; top: 10px; left: 10px; z-index: 1000;">
-        <div></div>
-        <div></div>
-        <div></div>
+    <button id="toggle-md-files" class="hamburger" aria-label="Toggle files" aria-expanded="false" title="Toggle files">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
     </button>
 
     <div id="sidebar">
@@ -948,7 +1254,14 @@
     </div>
 
     <div id="content">
-        <h1 id="page-header"></h1>
+<div class="lesson-header">
+    <h1 id="page-header"></h1>
+
+    <div id="page-actions" class="file-action-buttons" aria-hidden="true">
+        <!-- buttons injected by JS -->
+    </div>
+</div>
+
         <div class="preview-container">
             <div id="preview">
                 <!-- Your markdown content goes here -->
@@ -970,10 +1283,10 @@
        
     </div>
 
-      <button id="toc-toggle" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
-        <div></div>
-        <div></div>
-        <div></div>
+      <button id="toc-toggle" class="hamburger" aria-label="Toggle table of contents" aria-expanded="false" title="Toggle table of contents">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
     </button>
 
     <button id="slides-toggle" class="slides-btn" title="View as slides">View as slides</button>
@@ -1008,6 +1321,7 @@
     </div>
 
     <script>
+        let appConfig = {};
         async function loadConfig() {
             try {
                 const response = await fetch('config.json');
@@ -1017,7 +1331,21 @@
                 const config = await response.json();
                 applyConfig(config);
                 if (config.default_markdown) {
-                    loadMarkdownFile(config.default_markdown);
+                    const resolvedDefault = (function(cfg, name){
+                        if (!name) return null;
+                        if (name.includes('/') || name.startsWith('./') || name.startsWith('../')) return name;
+                        for (const group of (cfg.markdownFiles || [])) {
+                            for (const f of (group.files || [])) {
+                                if (f.fileName === name || f.displayName === name) {
+                                    return (group.path ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path) + '/' + f.fileName : f.fileName);
+                                }
+                            }
+                        }
+                        return name;
+                    })(config, config.default_markdown);
+                    if (resolvedDefault) {
+                        loadMarkdownFile(resolvedDefault);
+                    }
                     // highlight after load (default) will be handled by loadMarkdownFile
                 }
             } catch (error) {
@@ -1026,36 +1354,40 @@
         }
 
         function applyConfig(config) {
+            appConfig = config;
+            if (appConfig.mediaPath) {
+                appConfig.mediaPath = appConfig.mediaPath.replace(/\/+$/, '');
+            }
             document.title = config.pageTitle;
             document.getElementById('page-header').textContent = config.pageHeader;
 
             loadMarkdownFiles(config.markdownFiles);
 
             const utterancesContainer = document.getElementById('utterances-container');
-            if (config.utterances) {
-                const script = document.createElement('script');
-                script.src = 'https://utteranc.es/client.js';
-                script.setAttribute('repo', config.utterances.repo);
-                script.setAttribute('issue-term', config.utterances.issueTerm);
-                if (config.utterances.theme) {
-                    script.setAttribute('theme', config.utterances.theme);
-                }
-                script.setAttribute('crossorigin', 'anonymous');
-                script.async = true;
-                utterancesContainer.appendChild(script);
-            }
+            // keep utterances container empty for now; comments will be loaded per-file
+            utterancesContainer.innerHTML = '';
+            // store utterances config in appConfig so it can be used when files are opened
+            if (!appConfig.utterances && config.utterances) appConfig.utterances = config.utterances;
         }
 
-        function buildFileListItem(file) {
+        function resolveFilePath(groupPath, fileName) {
+            if (!groupPath) return fileName;
+            const gp = groupPath.endsWith('/') ? groupPath.slice(0, -1) : groupPath;
+            const fn = fileName.startsWith('/') ? fileName.slice(1) : fileName;
+            return gp + '/' + fn;
+        }
+
+        function buildFileListItem(file, groupPath = '') {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = '#';
             a.textContent = file.displayName;
-            a.dataset.file = file.fileName;
+            const resolved = resolveFilePath(groupPath, file.fileName);
+            a.dataset.file = resolved;
             a.className = 'guide-file-link';
             a.addEventListener('click', (e) => {
                 e.preventDefault();
-                loadMarkdownFile(file.fileName);
+                loadMarkdownFile(resolved);
             });
             li.appendChild(a);
             return li;
@@ -1077,6 +1409,182 @@
                     // do NOT persist this automatic open in localStorage (only user toggles persist)
                 }
             }
+        }
+
+        function getDisplayNameForPath(filePath) {
+            if (!filePath) return '';
+            const parts = filePath.split('/');
+            const fileOnly = parts[parts.length - 1];
+            // try to find a matching file entry in the config so we can use its displayName
+            for (const group of (appConfig.markdownFiles || [])) {
+                for (const f of (group.files || [])) {
+                    const groupPath = group.path ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path) : '';
+                    const resolved = groupPath ? (groupPath + '/' + f.fileName) : f.fileName;
+                    if (f.fileName === fileOnly || resolved === filePath || f.displayName === filePath) {
+                        return f.displayName || f.fileName;
+                    }
+                }
+            }
+            return fileOnly;
+        }
+
+        function setCurrentPageHeader(filePath) {
+            const name = getDisplayNameForPath(filePath) || (appConfig && appConfig.pageHeader) || '';
+            const headerEl = document.getElementById('page-header');
+            if (headerEl) headerEl.textContent = name;
+            // also update document title to include the app page title
+            if (appConfig && appConfig.pageTitle) {
+                document.title = (name ? name + ' - ' : '') + appConfig.pageTitle;
+            }
+            // update file action buttons (starter/final repos)
+            updateFileActionButtons(filePath);
+        }
+
+        // Load utterances for a specific file so comments are scoped per-file
+        function loadUtterancesForFile(filePath) {
+            const container = document.getElementById('utterances-container');
+            container.innerHTML = '';
+            if (!appConfig.utterances) return;
+
+
+
+            // Use the URL (including hash) as the issue-term so utterances will associate a unique thread per file
+            // We set the hash to a stable encoded form of the file path.
+            const encoded = encodeURIComponent(filePath || '');
+            const base = window.location.origin + window.location.pathname + window.location.search;
+            const newUrl = base + '#file=' + encoded;
+            history.replaceState({}, '', newUrl);
+
+            const script = document.createElement('script');
+            script.src = 'https://utteranc.es/client.js';
+            script.setAttribute('repo', appConfig.utterances.repo);
+            // use the page title as the issue-term so each file (which sets a unique title) has its own thread
+            script.setAttribute('issue-term', 'title');
+            // add a label with the file path for easier filtering in GitHub issues
+            script.setAttribute('label', encodeURIComponent(filePath || ''));
+            if (appConfig.utterances.theme) script.setAttribute('theme', appConfig.utterances.theme);
+            script.setAttribute('crossorigin', 'anonymous');
+            script.async = true;
+            container.appendChild(script);
+        }
+
+        // Find file config by path (group + file entry)
+        function getFileConfigForPath(filePath) {
+            if (!filePath || !appConfig.markdownFiles) return null;
+            for (const group of (appConfig.markdownFiles || [])) {
+                const gp = group.path ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path) : '';
+                for (const f of (group.files || [])) {
+                    const resolved = gp ? (gp + '/' + f.fileName) : f.fileName;
+                    if (resolved === filePath || f.fileName === filePath) {
+                        return Object.assign({ _group: group.group, _groupPath: gp }, f);
+                    }
+                }
+            }
+            return null;
+        }
+
+        function updateFileActionButtons(filePath) {
+            const container = document.getElementById('page-actions');
+            if (!container) return;
+            container.innerHTML = '';
+            const cfg = getFileConfigForPath(filePath);
+            if (!cfg) {
+                container.setAttribute('aria-hidden', 'true');
+                return;
+            }
+            const starter = cfg.starterRepo || cfg.starter || '';
+            const finalc = cfg.finalRepo || cfg.final || '';
+
+            function parseGitHubRepo(url) {
+                if (!url) return null;
+                try {
+                    const u = new URL(url, window.location.href);
+                    if (!u.hostname.includes('github.com')) return null;
+                    const parts = u.pathname.split('/').filter(Boolean);
+                    if (parts.length < 2) return null;
+                    const owner = parts[0];
+                    const repo = parts[1].replace(/\.git$/, '');
+                    let branch = null;
+                    const treeIndex = parts.indexOf('tree');
+                    if (treeIndex >= 0 && parts.length > treeIndex + 1) branch = parts[treeIndex + 1];
+                    return { isGitHub: true, owner, repo, branch };
+                } catch (e) { return null; }
+            }
+
+            async function getDefaultBranch(owner, repo) {
+                try {
+                    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+                    if (!r.ok) return null;
+                    const j = await r.json();
+                    return j && j.default_branch ? j.default_branch : null;
+                } catch (e) { return null; }
+            }
+
+            async function downloadRepoZip(url) {
+                const info = parseGitHubRepo(url);
+                if (!info) { window.open(url, '_blank'); return; }
+                let branch = info.branch || await getDefaultBranch(info.owner, info.repo) || 'main';
+                const zipUrl = `https://github.com/${info.owner}/${info.repo}/archive/refs/heads/${branch}.zip`;
+                window.open(zipUrl, '_blank');
+            }
+
+            function addActionLink(href, label, opts = {}) {
+                const el = document.createElement('a');
+                el.className = 'file-action-button' + (opts.secondary ? ' secondary' : '');
+                el.href = href;
+                el.target = '_blank';
+                el.rel = 'noopener';
+                el.textContent = label;
+                if (opts.title) el.title = opts.title;
+                container.appendChild(el);
+                return el;
+            }
+
+            function addDownloadButton(repoUrl) {
+                const info = parseGitHubRepo(repoUrl);
+                const btn = document.createElement('button');
+                btn.className = 'file-action-download';
+                btn.type = 'button';
+                btn.title = 'Download ZIP';
+                btn.textContent = 'Download ZIP';
+                btn.addEventListener('click', (e) => { e.preventDefault(); downloadRepoZip(repoUrl); });
+                container.appendChild(btn);
+                return btn;
+            }
+
+         // ---------- NEW UI ----------
+       // ---------- NEW UI ----------
+const row = document.createElement('div');
+row.className = 'download-row';
+
+const buttonGroup = document.createElement('div');
+buttonGroup.className = 'download-button-group';
+
+if (starter) {
+    const btnStarter = document.createElement('button');
+    btnStarter.className = 'download-btn';
+    btnStarter.textContent = 'Starter Code';
+    btnStarter.addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadRepoZip(starter);
+    });
+    buttonGroup.appendChild(btnStarter);
+}
+
+if (finalc) {
+    const btnFinal = document.createElement('button');
+    btnFinal.className = 'download-btn final';
+    btnFinal.textContent = 'Final Code';
+    btnFinal.addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadRepoZip(finalc);
+    });
+    buttonGroup.appendChild(btnFinal);
+}
+
+row.appendChild(buttonGroup);
+container.appendChild(row);
+container.setAttribute('aria-hidden', 'false');
         }
 
         function getSavedGroups() {
@@ -1114,7 +1622,7 @@
                     const ul = document.createElement('ul');
 
                     (group.files || []).forEach(file => {
-                        ul.appendChild(buildFileListItem(file));
+                        ul.appendChild(buildFileListItem(file, group.path || ''));
                     });
 
                     groupContents.appendChild(ul);
@@ -1159,9 +1667,13 @@
                     throw new Error('Network response was not ok');
                 }
                 const text = await response.text();
-                renderMarkdown(text);
+                renderMarkdown(text, fileName);
                 // highlight active file in Guide
                 highlightActiveFile(fileName);
+                // update the page header/title to reflect the current file
+                setCurrentPageHeader(fileName);
+                // load utterances comments scoped to this file (so each file has its own comment thread)
+                loadUtterancesForFile(fileName);
 
                 // after render, if an anchor (heading text) was provided, scroll to it
                 if (anchorText) {
@@ -1180,8 +1692,94 @@
             }
         }
 
-        function renderMarkdown(markdownText) {
-            const md = window.markdownit({
+        function renderMarkdown(markdownText, currentFile = '') {
+            // rewrite Obsidian-style embeds (![[file]]) and resolve image paths using appConfig.mediaPath
+            function rewriteImagePaths(mdText) {
+                let text = mdText;
+                const mediaRoot = (appConfig && appConfig.mediaPath) ? appConfig.mediaPath.replace(/\/+$/, '') : null;
+
+                // Obsidian embed syntax: ![[File name.png]] or ![[Media/File name.png]]
+                text = text.replace(/!\[\[([^\]]+)\]\]/g, (m, inner) => {
+                    let path = inner.split('|')[0].trim();
+                    // remove leading slashes
+                    path = path.replace(/^\/+/, '');
+                    const src = mediaRoot ? (mediaRoot + '/' + encodeURI(path)) : encodeURI(path);
+                    return '![](' + src + ')';
+                });
+
+                // Standard markdown images: ![alt](src)
+                text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, src) => {
+                    src = src.trim();
+                    if (src.startsWith('<') && src.endsWith('>')) src = src.slice(1, -1);
+                    // leave absolute URLs, data URLs, and rooted/relative paths alone
+                    if (/^(?:https?:|data:|\/|\.\.|\.\/)/i.test(src) || src.includes(':')) {
+                        return '![' + alt + '](' + src + ')';
+                    }
+                    // otherwise, prefix with mediaRoot if available
+                    if (mediaRoot) {
+                        const newSrc = mediaRoot + '/' + src;
+                        return '![' + alt + '](' + encodeURI(newSrc) + ')';
+                    }
+                    return m;
+                });
+
+                return text;
+            }
+
+            function rewriteYouTubeEmbeds(mdText) {
+                let text = mdText;
+                const originParam = encodeURIComponent(window.location.origin || window.location.href);
+                function extractId(url) {
+                    try {
+                        const u = new URL(url);
+                        if (u.hostname.includes('youtu.be')) {
+                            return u.pathname.slice(1).split(/[?#]/)[0];
+                        }
+                        if (u.hostname.includes('youtube.com')) {
+                            return u.searchParams.get('v');
+                        }
+                    } catch (e) {
+                        const m = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+                        return m && m[1];
+                    }
+                    const m = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+                    return m && m[1];
+                }
+
+                // URL on its own line (plain or wrapped in <>): embed
+                text = text.replace(/^(\s*<?(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^\s<>]+)>?\s*)$/gm, (m, whole, url) => {
+                    const cleaned = (url || whole).trim().replace(/^<|>$/g, '');
+                    const id = extractId(cleaned);
+                    if (!id) return m;
+                    return `<div class="video-embed" data-yid="${id}"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${id}?rel=0&origin=${originParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="YouTube video player"></iframe><div class="video-fallback">Can't play? <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Open on YouTube</a></div></div>`;
+                });
+
+                // markdown link on its own line: [text](youtube-url)
+                text = text.replace(/^(\s*\[[^\]]+\]\(\s*(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^\s)]+)\s*\)\s*)$/gm, (m, url) => {
+                    const id = extractId(url);
+                    if (!id) return m;
+                    return `<div class="video-embed" data-yid="${id}"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${id}?rel=0&origin=${originParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="YouTube video player"></iframe><div class="video-fallback">Can't play? <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Open on YouTube</a></div></div>`;
+                });
+
+                // markdown link where the URL is in the link text and the parentheses are empty: [https://...]()
+                text = text.replace(/^\s*\[(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^\]]+)\]\(\s*\)\s*$/gm, (m, url) => {
+                    const id = extractId(url);
+                    if (!id) return m;
+                    return `<div class="video-embed" data-yid="${id}"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${id}?rel=0&origin=${originParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="YouTube video player"></iframe><div class="video-fallback">Can't play? <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Open on YouTube</a></div></div>`;
+                });
+
+                // angle-bracketed URL anywhere
+                text = text.replace(/<https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^>]+>/g, (m) => {
+                    const url = m.slice(1, -1);
+                    const id = extractId(url);
+                    if (!id) return m;
+                    return `<div class="video-embed" data-yid="${id}"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${id}?rel=0&origin=${originParam}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="YouTube video player"></iframe><div class="video-fallback">Can't play? <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Open on YouTube</a></div></div>`;
+                });
+
+                return text;
+            }
+
+            const md = window.markdownit({ html: true,
                 highlight: function (str, lang) {
                     if (lang) {
                         try {
@@ -1195,12 +1793,15 @@
             });
 
             const previewArea = document.getElementById('preview');
-            previewArea.innerHTML = md.render(markdownText);
+            let processed = rewriteImagePaths(markdownText);
+            processed = rewriteYouTubeEmbeds(processed);
+            previewArea.innerHTML = md.render(processed);
             document.querySelectorAll('pre code').forEach((block) => {
                 hljs.highlightElement(block);
             });
             generateTOC();
             buildSlides();
+            attachYouTubePlayers();
         }
 
         function slugify(text) {
@@ -1208,6 +1809,88 @@
                 .replace(/[^\w\s-]/g, '')
                 .replace(/\s+/g, '-')
                 .replace(/-+/g, '-');
+        }
+
+        /* YouTube IFrame API-based fallback handler */
+        const __ytPending = [];
+        let __ytApiLoading = false;
+        function ensureYouTubeApiLoaded() {
+            if (window.YT && window.YT.Player) {
+                return Promise.resolve();
+            }
+            if (__ytApiLoading) return new Promise((res) => { const i = setInterval(()=>{ if (window.YT && window.YT.Player) { clearInterval(i); res(); } }, 50); });
+            __ytApiLoading = true;
+            return new Promise((resolve) => {
+                const tag = document.createElement('script');
+                tag.src = 'https://www.youtube.com/iframe_api';
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                window.onYouTubeIframeAPIReady = () => { resolve(); };
+                // safety: also poll in case onYouTube... not fired
+                const poll = setInterval(() => { if (window.YT && window.YT.Player) { clearInterval(poll); resolve(); } }, 100);
+            });
+        }
+
+        function attachYouTubePlayers() {
+            const containers = Array.from(document.querySelectorAll('.video-embed')).filter(el => el.dataset.yid && !el.dataset.ytInit);
+            if (containers.length === 0) return;
+            containers.forEach(el => el.dataset.ytInit = '1');
+            ensureYouTubeApiLoaded().then(() => {
+                containers.forEach((el, idx) => {
+                    tryInitPlayer(el);
+                });
+            }).catch(() => {
+                // leave fallback link visible if API load fails
+                containers.forEach(el => showFallback(el));
+            });
+        }
+
+        function tryInitPlayer(container) {
+            const yid = container.dataset.yid;
+            if (!yid) return showFallback(container);
+            // remove any pre-existing iframe placed by renderer to let API create a managed player
+            const existingIframe = container.querySelector('iframe');
+            if (existingIframe) existingIframe.remove();
+            // create a div placeholder
+            const pid = `yt-player-${yid}-${Math.random().toString(36).slice(2,9)}`;
+            const placeholder = document.createElement('div');
+            placeholder.id = pid;
+            placeholder.style.width = '100%';
+            placeholder.style.height = '100%';
+            // add placeholder at beginning
+            container.insertBefore(placeholder, container.firstChild);
+
+            // create the player using the nocookie host to keep privacy mode
+            try {
+                /* eslint-disable no-undef */
+                const player = new YT.Player(pid, {
+                    videoId: yid,
+                    host: 'https://www.youtube-nocookie.com',
+                    playerVars: {
+                        rel: 0,
+                        modestbranding: 1,
+                        origin: window.location.origin || window.location.href
+                    },
+                    events: {
+                        onError: (e) => {
+                            // error codes 100, 101, 150 usually mean unavailable or embedding disabled
+                            showFallback(container, yid);
+                        }
+                    }
+                });
+                /* eslint-enable no-undef */
+                // leave the fallback link hidden until error occurs
+                const fb = container.querySelector('.video-fallback');
+                if (fb) fb.style.display = 'none';
+            } catch (e) {
+                showFallback(container, yid);
+            }
+        }
+
+        function showFallback(container, yid) {
+            container.classList.add('embed-failed');
+            const id = yid || container.dataset.yid;
+            container.innerHTML = `<div class="video-fallback">Can't play? <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Open on YouTube</a></div>`;
         }
 
         function extractHeadingsFromMarkdown(mdText) {
@@ -1556,17 +2239,24 @@
         const toggleMdFilesButton = document.getElementById('toggle-md-files');
         toggleMdFilesButton.addEventListener('click', () => {
             const sidebar = document.getElementById('sidebar');
+            // toggle visual open state on button
+            toggleMdFilesButton.classList.toggle('open');
+            toggleMdFilesButton.setAttribute('aria-expanded', String(toggleMdFilesButton.classList.contains('open')));
+
             if (window.innerWidth <= 1200) {
                 sidebar.classList.toggle('overlay');
                 sidebar.classList.toggle('visible');
             } else {
-                sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+                const nowHidden = sidebar.style.display === 'none';
+                sidebar.style.display = nowHidden ? 'block' : 'none';
             }
         });
 
         const toggleTocButton = document.getElementById('toc-toggle');
         toggleTocButton.addEventListener('click', () => {
             const tocSidebar = document.getElementById('toc-sidebar');
+            toggleTocButton.classList.toggle('open');
+            toggleTocButton.setAttribute('aria-expanded', String(toggleTocButton.classList.contains('open')));
             if (window.innerWidth <= 1200) {
                 tocSidebar.classList.toggle('overlay');
                 tocSidebar.classList.toggle('visible');
@@ -1585,6 +2275,8 @@
             if (!isClickInsideTocSidebar && !isClickOnToggleTocButton && window.innerWidth <= 1200 && tocSidebar.classList.contains('visible')) {
                 tocSidebar.classList.remove('overlay');
                 tocSidebar.classList.remove('visible');
+                const tocToggleBtn = document.getElementById('toc-toggle');
+                if (tocToggleBtn) { tocToggleBtn.classList.remove('open'); tocToggleBtn.setAttribute('aria-expanded', 'false'); }
             }
         });
 
@@ -1595,6 +2287,8 @@
                 sidebar.classList.remove('overlay');
                 sidebar.classList.remove('visible');
                 sidebar.style.transition = 'transform 0.9s ease';
+                const mdToggleBtn = document.getElementById('toggle-md-files');
+                if (mdToggleBtn) { mdToggleBtn.classList.remove('open'); mdToggleBtn.setAttribute('aria-expanded', 'false'); }
             }
         }
     });

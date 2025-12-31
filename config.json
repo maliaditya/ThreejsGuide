@@ -1,16 +1,18 @@
 {
-  "pageTitle": "Documentation.",
-  "pageHeader": "Testing Documentation",
+  "pageTitle": "Threejs Guide.",
+  "pageHeader": "Threejs Guide",
   "utterances": {
     "repo": "maliaditya/Documentation",
     "issueTerm": "pathname",
     "issueNumber": null,
     "theme": "github-dark"
   },
+  "mediaPath": "./ThreejsExamples/Media",
   "default_markdown":"Coding Standards.md",
   "markdownFiles": [
     {
       "group": "Basics",
+      "path": "./ThreejsExamples/Basics",
       "files": [
         {
           "fileName": "Coding Standards.md",
@@ -24,12 +26,15 @@
     },
     {
       "group": "Advanced",
+      "path": "./ThreejsExamples/Advance",
       "files": [
         {
           "fileName": "C++ Style Guide.md",
-          "displayName": "C++ Style Guide"
+          "displayName": "C++ Style Guide ",
+          "starterRepo": "https://github.com/maliaditya/ThreejsGuide",
+          "finalRepo": "https://github.com/maliaditya/ThreejsGuide"
         }
       ]
     }
   ]
-}
+} 
