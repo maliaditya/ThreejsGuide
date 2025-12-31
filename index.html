@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title"></title>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+
+    <!-- Prism.js Theme for Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-cpp.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Highlight.js Theme for Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/cpp.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', Arial, Helvetica, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: auto;
+        }
+
+        #sidebar {
+            margin-top: 30px;
+            width: 280px;
+            padding: 15px;
+            border-right: 1px solid #3c3c3c;
+            overflow-y: auto;
+            height: 90%;
+            position: relative;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        #sidebar.overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #1e1e1e;
+            z-index: 2000;
+            transform: translateX(-100%);
+        }
+
+        #sidebar.overlay.visible {
+            transform: translateX(0);
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        #sidebar h3 {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #58a6ff;
+        }
+
+        #sidebar a {
+            display: flex;
+            align-items: center;
+            color: #ffffff;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            background:linear-gradient(to right, #7800ff, #9a31ff);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #sidebar a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Guide sidebar grouped file styles (only filenames listed under groups) */
+        .guide-group-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: #e6eef6;
+            transition: background 0.14s ease, transform 0.12s ease;
+            margin-top: 8px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+        }
+
+        .guide-group-header:hover { background: rgba(255,255,255,0.03); transform: translateY(-1px); }
+
+        .guide-group-header .caret {
+            color: #9aa7b2;
+            font-size: 12px;
+            width: 12px;
+            display: inline-block;
+            text-align: center;
+            transition: transform 0.18s ease;
+        }
+
+        .guide-group-header.open { background: rgba(255,255,255,0.01); }
+        .guide-group-header.open .caret { transform: rotate(90deg); color: #6a11cb; }
+
+        .guide-group-contents {
+            padding-left: 8px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.22s ease, opacity 0.18s ease;
+            opacity: 0;
+        }
+
+        .guide-group-contents.open { max-height: 1000px; opacity: 1; }
+
+        .guide-group-contents ul {
+            list-style: none;
+            margin: 6px 0 0 0;
+            padding: 0;
+            border-left: 1px solid rgba(255,255,255,0.03);
+            padding-left: 12px;
+        }
+
+        .guide-group-contents li {
+            margin-bottom: 6px;
+        }
+
+        .guide-group-contents a {
+            color: #cfd6e0;
+            font-size: 0.95em;
+            text-decoration: none;
+            padding: 6px 8px;
+            display: block;
+            border-radius: 6px;
+            position: relative;
+            transition: background 0.12s ease, color 0.12s ease;
+            background: transparent;
+        }
+
+        .guide-group-contents a::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            transform: translateY(-50%);
+            transition: background 0.12s ease;
+        }
+
+        /* hover: keep subtle, no full purple background */
+        .guide-group-contents a:hover { background: transparent; color: #ffffff; }
+
+        /* only active file gets the purple gradient */
+        .guide-group-contents a.active {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: #ffffff;
+            font-weight: 700;
+            padding-left: 10px;
+            padding-right: 14px;
+        }
+
+        .guide-group-contents a.active::before { background: #6a11cb; box-shadow: 0 0 8px rgba(106,17,203,0.18); }
+
+        /* small temporary highlight for scrolled-to header */
+        .preview-highlight {
+            box-shadow: inset 0 -4px 0 0 rgba(106,17,203,0.3);
+            transition: box-shadow 0.4s ease;
+        }
+
+        #content {
+            margin: 0;
+            padding: 30px;
+            flex: 1;
+            overflow-y: auto;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #content::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        #content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .preview-container {
+            position: relative;
+            border-radius: 50px;
+            padding: 2px;
+        }
+
+        .preview-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            padding: 2px;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        #preview {
+            position: relative;
+            border-radius: 8px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            color: #d4d4d4;
+            overflow: hidden;
+        }
+
+        #preview img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        a {
+            color: #56b6c2;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: #673ab7;
+            color: #F8F8F2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 1em;
+            font-family: 'Courier New', Courier, monospace;
+            display: inline-block;
+        }
+
+        pre {
+            background-color: #2D2D2D;
+            color: #F8F8F2;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #44475a;
+            font-size: 0.98em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .token.comment,
+        .token.prolog,
+        .token.doctype,
+        .token.cdata {
+            color: #6272a4;
+        }
+
+        .token.punctuation {
+            color: #f8f8f2;
+        }
+
+        .token.property,
+        .token.tag,
+        .token.constant,
+        .token.symbol,
+        .token.deleted {
+            color: #ff79c6;
+        }
+
+        .token.boolean,
+        .token.number {
+            color: #bd93f9;
+        }
+
+        .token.selector,
+        .token.attr-name,
+        .token.string,
+        .token.char,
+        .token.builtin,
+        .token.inserted {
+            color: #50fa7b;
+        }
+
+        .token.operator,
+        .token.entity,
+        .token.url,
+        .language-css .token.string,
+        .style .token.string {
+            color: #f1fa8c;
+        }
+
+        .token.atrule,
+        .token.attr-value,
+        .token.keyword {
+            color: #8be9fd;
+        }
+
+        .token.function,
+        .token.class-name {
+            color: #66d9ef;
+        }
+
+        .token.regex,
+        .token.important,
+        .token.variable {
+            color: #ffb86c;
+        }
+
+        .token.important,
+        .token.bold {
+            font-weight: bold;
+        }
+
+        .token.italic {
+            font-style: italic;
+        }
+
+        .token.entity {
+            cursor: help;
+        }
+
+        #toc-sidebar {
+            margin-top: 30px;
+            width: 280px;
+            padding: 15px;
+            border-left: 1px solid #3c3c3c;
+            overflow-y: auto;
+            height: fit-content;
+            position: relative;
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+            margin-left: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        #toc-sidebar.overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            background-color: #1e1e1e;
+            z-index: 2000;
+            transform: translateX(100%);
+        }
+
+        #toc-sidebar.overlay.visible {
+            transform: translateX(0);
+        }
+
+        #toc-sidebar h3 {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #58a6ff;
+        }
+
+        #toc-sidebar a {
+            display: block;
+            color: #d4d4d4;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        #toc-sidebar a:hover {
+            background-color: #3c3c3c;
+        }
+
+        #toc-sidebar a.active {
+            background-color: #6a11cb;
+            color: #ffffff;
+        }
+
+        /* Nested TOC styling (tightened) - dots removed, lines kept */
+        #toc-list { position: relative; }
+        #toc-list ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 0;
+            position: relative;
+        }
+
+        /* reduce overall left spacing so connectors sit close to text */
+        #toc-list li {
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 12px; /* tightened */
+        }
+
+        /* vertical connector line for nested lists (thinner & closer) */
+        #toc-list ul ul::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 8px;
+            bottom: 8px;
+            width: 1px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 1px;
+        }
+
+        /* remove circular dots - keep clean lines only */
+        #toc-list li::before {
+            display: none;
+        }
+
+        /* completed-toggle area (small, invisible button that sits over the dot) */
+        .toc-complete-toggle {
+            position: absolute;
+            left: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* small dot for each item (now visible) */
+        #toc-list li::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            transform: translateY(-50%);
+            transition: background-color 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        /* smaller dots for nested levels */
+        #toc-list ul ul li::before {
+            width: 5px;
+            height: 5px;
+            left: 5px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        #toc-list ul ul ul li::before {
+            width: 4px;
+            height: 4px;
+            left: 9px;
+            background: rgba(255,255,255,0.04);
+        }
+
+        /* completed shows a small green check in place of the dot */
+        #toc-list li.completed::before {
+            width: 10px;
+            height: 10px;
+            left: 3px;
+            background: #10b981 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'><path d='M20.285 6.709l-11.025 11.02-5.545-5.546 1.414-1.414 4.131 4.132 9.611-9.618z'/></svg>") no-repeat center / 10px 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(16,185,129,0.18);
+            transform: translateY(-50%) scale(1.02);
+        }
+
+        /* add a subtle horizontal active indicator aligned with each item */
+        #toc-list li::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            width: 0;
+            height: 2px;
+            background: transparent;
+            transform: translateY(-50%);
+            transition: width 0.12s ease, background 0.12s ease;
+            border-radius: 2px;
+        }
+
+        #toc-list li.active::after {
+            width: 10px;
+            background: #6a11cb;
+            box-shadow: 0 0 6px rgba(106,17,203,0.22);
+        }
+
+        /* show L-branch for items that have children */
+        #toc-list li.has-children > a::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            width: 10px;
+            height: 1px;
+            background: rgba(255,255,255,0.03);
+            transform: translateY(-50%);
+        }
+
+        #toc-list li a {
+            display: block;
+            color: #d4d4d4;
+            padding: 6px 8px; /* tightened */
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.15s ease;
+        }
+
+        #toc-list li a:hover {
+            background-color: #3c3c3c;
+        }
+
+        /* nested connector adjustments */
+        #toc-list ul ul::before {
+            left: 11px;
+        }
+
+        #toc-list ul ul li a {
+            padding-left: 18px;
+            font-size: 0.95em;
+            color: #cfd6e0;
+        }
+
+        #toc-list ul ul ul::before {
+            left: 15px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        #toc-list ul ul ul li a {
+            padding-left: 28px;
+            font-size: 0.9em;
+            color: #bfc8d8;
+        }
+
+        /* completed state visuals */
+        #toc-list li.completed > a {
+            opacity: 0.95;
+            color: #dff7ea;
+        }
+
+        /* active link styles (for li.active) */
+        #toc-list li.active > a {
+            background-color: #6a11cb;
+            color: #ffffff;
+        }
+
+        /* Slides button (bottom-right) */
+        .slides-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 4000;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+            font-weight: 600;
+        }
+
+        .slides-btn:hover { transform: translateY(-2px); }
+
+        /* Slides overlay */
+        .slides-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.75);
+            z-index: 5000;
+            padding: 40px;
+        }
+
+        .slides-overlay.open { display: flex; }
+
+        .slides-inner {
+            width: 80%;
+            max-width: 900px;
+            background: #151515;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            color: #e6eef6;
+            position: relative;
+            overflow: auto;
+            max-height: 80vh;
+        }
+
+        .slide-content > h1, .slide-content > h2, .slide-content > h3 { margin-top: 0; }
+
+        .slide-controls {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .slide-btn {
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: #d4d4d4;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .slide-btn:disabled { opacity: 0.35; cursor: default; }
+
+        .slides-close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: transparent;
+            border: none;
+            color: #d4d4d4;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Inline slide view (replaces preview when active) */
+        .slide-view {
+            display: none;
+            margin-top: 18px;
+            background: #151515;
+            padding: 18px;
+            border-radius: 8px;
+            color: #e6eef6;
+        }
+
+        .slide-view.open { display: block; }
+
+        .slide-inline h1, .slide-inline h2, .slide-inline h3 { margin-top: 0; }
+
+        .slide-controls-inline {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* Slides button when active */
+        .slides-btn.active {
+            background: linear-gradient(to right, #10b981, #06b6a4);
+        }
+
+        /* When slide-only mode is active, hide all non-slide UI and make the slide view full-screen */
+        body.slide-inline-active #sidebar,
+        body.slide-inline-active #toc-sidebar,
+        body.slide-inline-active #toggle-md-files,
+        body.slide-inline-active #toc-toggle,
+        body.slide-inline-active .slides-btn,
+        body.slide-inline-active #support-section,
+        body.slide-inline-active #utterances-container,
+        body.slide-inline-active footer,
+        body.slide-inline-active .preview-container,
+        body.slide-inline-active #file-list {
+            display: none !important;
+        }
+
+        body.slide-inline-active #content {
+            padding: 0 !important;
+        }
+
+        /* make the slide-view cover the whole viewport */
+        body.slide-inline-active #slide-view {
+            display: block !important;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 10000 !important;
+            background: rgba(6,6,6,0.98) !important;
+            padding: 48px !important;
+            overflow: auto !important;
+        }
+
+        /* Scrollbar styling for slide view to match site */
+        #slide-view::-webkit-scrollbar {
+            width: 8px;
+        }
+        #slide-view::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        #slide-view::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        /* Firefox */
+        #slide-view {
+            scrollbar-width: thin;
+            scrollbar-color: #444 #1e1e1e;
+        }
+        }
+
+        body.slide-inline-active .slide-inline {
+            max-width: 960px;
+            margin: 0 auto;
+            background: transparent;
+            padding: 6px 12px;
+        }
+
+        body.slide-inline-active .slide-controls-inline {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            margin: 0;
+            z-index: 10001;
+        }
+
+        @media (max-width: 1200px) {
+            #sidebar {
+                display: none;
+            }
+
+            #sidebar.overlay {
+                display: block;
+            }
+
+            #toc-sidebar {
+                display: none;
+            }
+
+            #toc-sidebar.overlay {
+                display: block;
+            }
+
+        /* CSS for both toggle buttons */
+        #toggle-md-files, #toc-toggle {
+            display: block;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 3000;
+            position: fixed;
+            top: 10px;
+        }
+           #toggle-md-files div, #toc-toggle div {
+            width: 30px;
+            height: 3px;
+            background-color: #ffffff;
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+             
+        }
+  /* Position adjustments for each button */
+        #toggle-md-files {
+            left: 10px;
+        }
+
+        #toc-toggle {
+            right: 10px;
+        }
+        #support-section {
+            padding: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #support-section h2 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        #support-section a {
+            margin: 5px;
+            text-decoration: none;
+            color: #58a6ff;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        #support-section a img {
+            width: 180px;
+            height: 45px;
+            margin-bottom: 5px;
+        }
+
+        #support-section a:hover {
+            color: #ffffff;
+        }
+@media (max-width: 500px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    #sidebar,
+    #toc-sidebar {
+        display: none;
+    }
+
+    #content {
+        padding: 10px;
+        width: 100%;
+    }
+
+    #preview {
+        padding: 0px;
+        font-size: 0.7em;
+        line-height: 1.5;
+        position: relative;
+        border-radius: 8px;
+        background-color: #1e1e1e;
+        padding: 0px;
+        box-shadow: 0 0px 0px rgba(0, 0, 0, 0.3);
+        color: #d4d4d4;
+        overflow: hidden;
+    }
+  
+
+    #toggle-md-files, #toc-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        z-index: 3000;
+    }
+
+    #toggle-md-files div,#toc-toggle div {
+        width: 20px;
+        height: 3px;
+        margin: 4px 0;
+        background-color: #ffffff;
+    }
+
+     /* Position adjustments for each button */
+        #toggle-md-files {
+            left: 10px;
+        }
+
+        #toc-toggle {
+            right: 10px;
+        }
+
+    #support-section {
+        padding: 8px;
+        font-size: 0.8em;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2, h3, h4, h5, h6 {
+        font-size: 1.2em;
+    }
+
+    pre {$1$2}
+
+    code {$1$2}
+
+      pre {
+            background-color: #2D2D2D;
+            color: #F8F8F2;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #44475a;
+            font-size: 0.8em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+
+    a {
+        font-size: 1em;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+  
+
+    #preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    #preview p {
+        margin-bottom: 10px;
+    }
+
+    #preview ul {
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+
+    #preview li {
+        margin-bottom: 5px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <button id="toggle-md-files" style="position: fixed; top: 10px; left: 10px; z-index: 1000;">
+        <div></div>
+        <div></div>
+        <div></div>
+    </button>
+
+    <div id="sidebar">
+        <h3>Guide</h3>
+        <div id="file-list">
+            <!-- JavaScript will populate this -->
+        </div>
+    </div>
+
+    <div id="content">
+        <h1 id="page-header"></h1>
+        <div class="preview-container">
+            <div id="preview">
+                <!-- Your markdown content goes here -->
+            </div>
+             <!-- Utterances Comment Section -->
+            <div id="utterances-container"></div>
+            <!-- End of Utterances -->
+        </div>
+
+        <!-- Inline Slide View (hidden by default) -->
+        <div id="slide-view" class="slide-view" style="display:none;">
+            <div id="slide-inline" class="slide-inline"></div>
+            <div class="slide-controls-inline">
+                <button id="slide-prev-inline" class="slide-btn">Prev</button>
+                <button id="slide-next-inline" class="slide-btn">Next</button>
+                <button id="slide-close-inline" class="slide-btn">Exit</button>
+            </div>
+        </div>
+       
+    </div>
+
+      <button id="toc-toggle" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+        <div></div>
+        <div></div>
+        <div></div>
+    </button>
+
+    <button id="slides-toggle" class="slides-btn" title="View as slides">View as slides</button>
+
+    <div id="toc-sidebar">
+        <h3>Table of Contents</h3>
+        <div id="toc-list"></div>
+        <div id="support-section">
+            <h2>Support My Work</h2>
+            <a href="https://www.buymeacoffee.com/adityamali98" target="_blank"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=adityamali98&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+            <a href="https://www.youtube.com/@GFX-Programming" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;"> GFX Programming
+            </a>
+            <div style="text-align: center; padding-top: 20px; color: #d4d4d4; font-size: 0.9em;">
+                Explained by
+            </div>
+            <a href="https://www.linkedin.com/in/aditya-mali-477a01156/" style="color: #ffdd00; font-size: 0.9em;">
+                Aditya Mali
+            </a>
+        </div>
+    </div>
+
+    <div id="slides-overlay" class="slides-overlay" aria-hidden="true">
+        <div class="slides-inner">
+            <button id="slides-close" class="slides-close" aria-label="Close">×</button>
+            <div id="slide-content" class="slide-content"></div>
+            <div class="slide-controls">
+                <button id="slide-prev" class="slide-btn">Prev</button>
+                <button id="slide-next" class="slide-btn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadConfig() {
+            try {
+                const response = await fetch('config.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load config.json');
+                }
+                const config = await response.json();
+                applyConfig(config);
+                if (config.default_markdown) {
+                    loadMarkdownFile(config.default_markdown);
+                    // highlight after load (default) will be handled by loadMarkdownFile
+                }
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        function applyConfig(config) {
+            document.title = config.pageTitle;
+            document.getElementById('page-header').textContent = config.pageHeader;
+
+            loadMarkdownFiles(config.markdownFiles);
+
+            const utterancesContainer = document.getElementById('utterances-container');
+            if (config.utterances) {
+                const script = document.createElement('script');
+                script.src = 'https://utteranc.es/client.js';
+                script.setAttribute('repo', config.utterances.repo);
+                script.setAttribute('issue-term', config.utterances.issueTerm);
+                if (config.utterances.theme) {
+                    script.setAttribute('theme', config.utterances.theme);
+                }
+                script.setAttribute('crossorigin', 'anonymous');
+                script.async = true;
+                utterancesContainer.appendChild(script);
+            }
+        }
+
+        function buildFileListItem(file) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = file.displayName;
+            a.dataset.file = file.fileName;
+            a.className = 'guide-file-link';
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadMarkdownFile(file.fileName);
+            });
+            li.appendChild(a);
+            return li;
+        }
+
+        function highlightActiveFile(fileName) {
+            // remove previous
+            document.querySelectorAll('.guide-file-link.active').forEach(el => el.classList.remove('active'));
+            const el = document.querySelector(`.guide-file-link[data-file="${fileName}"]`);
+            if (el) {
+                el.classList.add('active');
+                // ensure parent group is open (do not apply highlight class to the group header)
+                const groupContents = el.closest('.guide-group-contents');
+                if (groupContents && !groupContents.classList.contains('open')) {
+                    const header = groupContents.previousElementSibling;
+                    const caret = header && header.querySelector('.caret');
+                    groupContents.classList.add('open');
+                    if (caret) caret.textContent = '▾';
+                    // do NOT persist this automatic open in localStorage (only user toggles persist)
+                }
+            }
+        }
+
+        function getSavedGroups() {
+            try {
+                return JSON.parse(localStorage.getItem('guideGroups') || '{}');
+            } catch (e) { return {}; }
+        }
+        function saveGroups(obj) {
+            try { localStorage.setItem('guideGroups', JSON.stringify(obj)); } catch (e) {}
+        }
+
+        function loadMarkdownFiles(markdownFiles) {
+            const fileListElement = document.getElementById('file-list');
+            fileListElement.innerHTML = '';
+
+            const saved = getSavedGroups();
+
+            // Support grouped format: [{ group: 'Basics', files: [...] }, ...]
+            if (markdownFiles.length && markdownFiles[0].group && Array.isArray(markdownFiles[0].files)) {
+                markdownFiles.forEach(group => {
+                    const groupHeader = document.createElement('div');
+                    groupHeader.className = 'guide-group-header';
+
+                    const caret = document.createElement('span');
+                    caret.className = 'caret';
+                    caret.textContent = '▸';
+                    groupHeader.appendChild(caret);
+
+                    const title = document.createElement('span');
+                    title.textContent = group.group;
+                    groupHeader.appendChild(title);
+
+                    const groupContents = document.createElement('div');
+                    groupContents.className = 'guide-group-contents';
+                    const ul = document.createElement('ul');
+
+                    (group.files || []).forEach(file => {
+                        ul.appendChild(buildFileListItem(file));
+                    });
+
+                    groupContents.appendChild(ul);
+
+                    // restore saved state
+                    const isOpenSaved = !!saved[group.group];
+                    if (isOpenSaved) {
+                        groupContents.classList.add('open');
+                        groupHeader.classList.add('open');
+                        caret.textContent = '▾';
+                    }
+
+                    // toggle expansion when header clicked
+                    groupHeader.addEventListener('click', () => {
+                        const isOpen = groupContents.classList.toggle('open');
+                        groupHeader.classList.toggle('open', isOpen);
+                        caret.textContent = isOpen ? '▾' : '▸';
+                        // persist
+                        const obj = getSavedGroups();
+                        obj[group.group] = isOpen;
+                        saveGroups(obj);
+                    });
+
+                    fileListElement.appendChild(groupHeader);
+                    fileListElement.appendChild(groupContents);
+                });
+                return;
+            }
+
+            // fallback: flat list of files (no subtopics)
+            const ul = document.createElement('ul');
+            markdownFiles.forEach(file => {
+                ul.appendChild(buildFileListItem(file));
+            });
+            fileListElement.appendChild(ul);
+        }
+
+        async function loadMarkdownFile(fileName, anchorText = null) {
+            try {
+                const response = await fetch(fileName);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const text = await response.text();
+                renderMarkdown(text);
+                // highlight active file in Guide
+                highlightActiveFile(fileName);
+
+                // after render, if an anchor (heading text) was provided, scroll to it
+                if (anchorText) {
+                    // small timeout to ensure ids are applied
+                    setTimeout(() => {
+                        const headers = Array.from(document.getElementById('preview').querySelectorAll('h1, h2, h3, h4, h5, h6'));
+                        const target = headers.find(h => h.textContent.trim() === anchorText.trim());
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                            // note: no visual highlight on the content heading — only the file name in the Guide is highlighted
+                        }
+                    }, 40);
+                }
+            } catch (error) {
+                console.error('Error loading markdown file:', error);
+            }
+        }
+
+        function renderMarkdown(markdownText) {
+            const md = window.markdownit({
+                highlight: function (str, lang) {
+                    if (lang) {
+                        try {
+                            return '<pre><code class="language-' + lang + '">' +
+                                hljs.highlight(str, { language: lang }).value +
+                                '</code></pre>';
+                        } catch (__) {}
+                    }
+                    return '<pre><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+                }
+            });
+
+            const previewArea = document.getElementById('preview');
+            previewArea.innerHTML = md.render(markdownText);
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+            generateTOC();
+            buildSlides();
+        }
+
+        function slugify(text) {
+            return text.toLowerCase().trim()
+                .replace(/[^\w\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+        }
+
+        function extractHeadingsFromMarkdown(mdText) {
+            const lines = mdText.split(/\r?\n/);
+            const headings = [];
+            lines.forEach(line => {
+                const m = line.match(/^(#{1,6})\s+(.*)$/);
+                if (m) {
+                    headings.push({ level: m[1].length, text: m[2].trim() });
+                }
+            });
+            return headings;
+        }
+
+        function buildNestedListFromHeadings(headings, file) {
+            const rootUl = document.createElement('ul');
+            const stack = [{ level: 0, ul: rootUl }];
+            headings.forEach(h => {
+                const level = Math.max(1, Math.min(6, h.level));
+                if (level > stack[stack.length - 1].level) {
+                    for (let l = stack[stack.length - 1].level + 1; l <= level; l++) {
+                        const parentUl = stack[stack.length - 1].ul;
+                        let parentLi = parentUl.lastElementChild;
+                        if (!parentLi) {
+                            parentLi = document.createElement('li');
+                            parentUl.appendChild(parentLi);
+                        }
+                        const newUl = document.createElement('ul');
+                        parentLi.appendChild(newUl);
+                        stack.push({ level: l, ul: newUl });
+                    }
+                } else {
+                    while (level < stack[stack.length - 1].level) stack.pop();
+                }
+
+                const currentUl = stack[stack.length - 1].ul;
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = h.text;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // load the file and scroll to the heading text
+                    loadMarkdownFile(file.fileName, h.text);
+                    // expand the file node in the sidebar
+                    const fileNode = a.closest('.guide-file');
+                    if (fileNode) {
+                        const contents = fileNode.querySelector('.guide-file-contents');
+                        const caret = fileNode.querySelector('.caret');
+                        if (contents && caret) {
+                            contents.classList.add('open');
+                            caret.textContent = '▾';
+                        }
+                    }
+                });
+                li.appendChild(a);
+                currentUl.appendChild(li);
+            });
+            return rootUl;
+        }
+
+        // Completed state helpers (localStorage)
+        function getCompletedIds() {
+            try {
+                const raw = localStorage.getItem('tocCompleted') || '[]';
+                return new Set(JSON.parse(raw));
+            } catch (e) {
+                return new Set();
+            }
+        }
+
+        function saveCompletedIds(set) {
+            try {
+                localStorage.setItem('tocCompleted', JSON.stringify(Array.from(set)));
+            } catch (e) {}
+        }
+
+        function generateTOC() {
+            const tocListElement = document.getElementById('toc-list');
+            tocListElement.innerHTML = '';
+            const headers = Array.from(document.getElementById('preview').querySelectorAll('h1, h2, h3, h4, h5, h6'));
+            if (headers.length === 0) return;
+
+            const completed = getCompletedIds();
+
+            const rootUl = document.createElement('ul');
+            rootUl.className = 'toc-root';
+            const stack = [{ level: 0, ul: rootUl }];
+
+            headers.forEach(header => {
+                // ensure header has id
+                if (!header.id) {
+                    let id = slugify(header.textContent);
+                    let uniqueId = id;
+                    let idx = 1;
+                    while (document.getElementById(uniqueId)) {
+                        uniqueId = `${id}-${idx++}`;
+                    }
+                    header.id = uniqueId;
+                }
+
+                const level = parseInt(header.tagName.substring(1), 10);
+
+                // Adjust stack to the correct level
+                if (level > stack[stack.length - 1].level) {
+                    for (let l = stack[stack.length - 1].level + 1; l <= level; l++) {
+                        const parentUl = stack[stack.length - 1].ul;
+                        let parentLi = parentUl.lastElementChild;
+                        if (!parentLi) {
+                            parentLi = document.createElement('li');
+                            parentUl.appendChild(parentLi);
+                        }
+                        const newUl = document.createElement('ul');
+                        parentLi.appendChild(newUl);
+                        stack.push({ level: l, ul: newUl });
+                    }
+                } else {
+                    while (level < stack[stack.length - 1].level) {
+                        stack.pop();
+                    }
+                }
+
+                const currentUl = stack[stack.length - 1].ul;
+                const li = document.createElement('li');
+
+                // toggle button for completed state
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'toc-complete-toggle';
+                toggleBtn.title = 'Mark completed';
+                toggleBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    const id = header.id;
+                    if (completed.has(id)) {
+                        completed.delete(id);
+                        toggleBtn.classList.remove('checked');
+                        li.classList.remove('completed');
+                    } else {
+                        completed.add(id);
+                        toggleBtn.classList.add('checked');
+                        li.classList.add('completed');
+                    }
+                    saveCompletedIds(completed);
+                });
+
+                const link = document.createElement('a');
+                link.href = `#${header.id}`;
+                link.textContent = header.textContent;
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    header.scrollIntoView({ behavior: 'smooth' });
+                    // mark the clicked item as active
+                    tocListElement.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+                    li.classList.add('active');
+                });
+                link.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    enterInlineSlidesAtHeaderId(header.id);
+                });
+
+                // set initial completed state
+                if (completed.has(header.id)) {
+                    toggleBtn.classList.add('checked');
+                    li.classList.add('completed');
+                }
+
+                li.appendChild(toggleBtn);
+                li.appendChild(link);
+                currentUl.appendChild(li);
+            });
+
+            // mark items with children for L-branch visuals
+            rootUl.querySelectorAll('li').forEach(item => {
+                if (item.querySelector('ul')) item.classList.add('has-children');
+            });
+
+            tocListElement.appendChild(rootUl);
+        }
+
+        // --- Slide mode functionality ---
+        let slides = [];
+        let currentSlide = 0;
+
+        function buildSlides() {
+            slides = [];
+            const preview = document.getElementById('preview');
+            if (!preview) return;
+            const headers = Array.from(preview.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+            if (headers.length === 0) {
+                slides = [{ id: null, html: preview.innerHTML }];
+                return;
+            }
+            headers.forEach(header => {
+                let html = header.outerHTML;
+                let el = header.nextElementSibling;
+                while (el && !(el.tagName && /^H[1-6]$/.test(el.tagName))) {
+                    html += el.outerHTML;
+                    el = el.nextElementSibling;
+                }
+                slides.push({ id: header.id || null, html });
+            });
+        }
+
+        function openSlides(startIndex = 0) {
+            const overlay = document.getElementById('slides-overlay');
+            if (!overlay) return;
+            currentSlide = Math.max(0, Math.min(startIndex, slides.length - 1));
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+            updateSlide();
+        }
+
+        function closeSlides() {
+            const overlay = document.getElementById('slides-overlay');
+            if (!overlay) return;
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+
+        function updateSlide() {
+            const content = document.getElementById('slide-content');
+            if (!content) return;
+            content.innerHTML = slides[currentSlide] ? slides[currentSlide].html : '';
+            const prevBtn = document.getElementById('slide-prev');
+            const nextBtn = document.getElementById('slide-next');
+            if (prevBtn) prevBtn.disabled = currentSlide === 0;
+            if (nextBtn) nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function openSlidesAtHeaderId(id) {
+            const idx = slides.findIndex(s => s.id === id);
+            if (idx >= 0) openSlides(idx);
+        }
+
+        // UI hooks
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'slides-toggle') {
+                e.preventDefault();
+                // toggle inline slide view
+                const isInline = document.body.classList.contains('slide-inline-active');
+                if (isInline) exitInlineSlides();
+                else enterInlineSlides(0);
+            }
+        });
+
+        const nextBtnInit = document.getElementById('slide-next');
+        if (nextBtnInit) nextBtnInit.addEventListener('click', nextSlide);
+        const prevBtnInit = document.getElementById('slide-prev');
+        if (prevBtnInit) prevBtnInit.addEventListener('click', prevSlide);
+        const closeBtnInit = document.getElementById('slides-close');
+        if (closeBtnInit) closeBtnInit.addEventListener('click', closeSlides);
+
+        // keyboard navigation for overlay and inline slide view
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('slides-overlay');
+            const inlineActive = document.body.classList.contains('slide-inline-active');
+            if ((overlay && overlay.classList.contains('open'))) {
+                if (e.key === 'ArrowRight') nextSlide();
+                else if (e.key === 'ArrowLeft') prevSlide();
+                else if (e.key === 'Escape') closeSlides();
+                return;
+            }
+            if (inlineActive) {
+                if (e.key === 'ArrowRight') nextSlideInline();
+                else if (e.key === 'ArrowLeft') prevSlideInline();
+                else if (e.key === 'Escape') exitInlineSlides();
+            }
+        });
+
+        // Inline slide controls
+        function enterInlineSlides(startIndex = 0) {
+            buildSlides();
+            currentSlide = Math.max(0, Math.min(startIndex, slides.length - 1));
+            // activate slide-only UI
+            document.body.classList.add('slide-inline-active');
+            // prevent background scroll
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+            // hide preview container (kept for restoration) and other UI via CSS rules
+            document.getElementById('preview').closest('.preview-container').style.display = 'none';
+            const sv = document.getElementById('slide-view');
+            sv.classList.add('open');
+            sv.style.display = 'block';
+            document.getElementById('slides-toggle').classList.add('active');
+            document.getElementById('slides-toggle').textContent = 'View as document';
+            updateSlideInline();
+        }
+
+        function exitInlineSlides() {
+            document.body.classList.remove('slide-inline-active');
+            // restore scrolling
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
+            const sv = document.getElementById('slide-view');
+            sv.classList.remove('open');
+            sv.style.display = 'none';
+            document.getElementById('preview').closest('.preview-container').style.display = '';
+            document.getElementById('slides-toggle').classList.remove('active');
+            document.getElementById('slides-toggle').textContent = 'View as slides';
+        }
+
+        function updateSlideInline() {
+            const content = document.getElementById('slide-inline');
+            if (!content) return;
+            content.innerHTML = slides[currentSlide] ? slides[currentSlide].html : '';
+            const prevBtn = document.getElementById('slide-prev-inline');
+            const nextBtn = document.getElementById('slide-next-inline');
+            if (prevBtn) prevBtn.disabled = currentSlide === 0;
+            if (nextBtn) nextBtn.disabled = currentSlide === slides.length - 1;
+            // ensure syntax highlighting inside slide
+            content.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+        }
+
+        function nextSlideInline() { if (currentSlide < slides.length - 1) { currentSlide++; updateSlideInline(); } }
+        function prevSlideInline() { if (currentSlide > 0) { currentSlide--; updateSlideInline(); } }
+
+        const nextInlineBtn = document.getElementById('slide-next-inline');
+        if (nextInlineBtn) nextInlineBtn.addEventListener('click', nextSlideInline);
+        const prevInlineBtn = document.getElementById('slide-prev-inline');
+        if (prevInlineBtn) prevInlineBtn.addEventListener('click', prevSlideInline);
+        const closeInlineBtn = document.getElementById('slide-close-inline');
+        if (closeInlineBtn) closeInlineBtn.addEventListener('click', exitInlineSlides);
+
+        // helper to open inline slide for a specific header id
+        function enterInlineSlidesAtHeaderId(id) {
+            const idx = slides.findIndex(s => s.id === id);
+            if (idx >= 0) enterInlineSlides(idx);
+        }
+
+        loadConfig();
+
+        const toggleMdFilesButton = document.getElementById('toggle-md-files');
+        toggleMdFilesButton.addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 1200) {
+                sidebar.classList.toggle('overlay');
+                sidebar.classList.toggle('visible');
+            } else {
+                sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
+        const toggleTocButton = document.getElementById('toc-toggle');
+        toggleTocButton.addEventListener('click', () => {
+            const tocSidebar = document.getElementById('toc-sidebar');
+            if (window.innerWidth <= 1200) {
+                tocSidebar.classList.toggle('overlay');
+                tocSidebar.classList.toggle('visible');
+            } else {
+                tocSidebar.style.display = tocSidebar.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
+// Hide TOC sidebar when clicking anywhere outside of it
+        document.addEventListener('click', (event) => {
+            const tocSidebar = document.getElementById('toc-sidebar');
+            const toggleTocButton = document.getElementById('toc-toggle');
+            const isClickInsideTocSidebar = tocSidebar.contains(event.target);
+            const isClickOnToggleTocButton = toggleTocButton.contains(event.target);
+
+            if (!isClickInsideTocSidebar && !isClickOnToggleTocButton && window.innerWidth <= 1200 && tocSidebar.classList.contains('visible')) {
+                tocSidebar.classList.remove('overlay');
+                tocSidebar.classList.remove('visible');
+            }
+        });
+
+        document.getElementById('sidebar').addEventListener('click', (event) => {
+        if (event.target.tagName === 'A') {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 1200 ) {
+                sidebar.classList.remove('overlay');
+                sidebar.classList.remove('visible');
+                sidebar.style.transition = 'transform 0.9s ease';
+            }
+        }
+    });
+
+    </script>
+</body>
+</html>
