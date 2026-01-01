@@ -8,29 +8,29 @@
     "theme": "github-dark"
   },
   "mediaPath": "./ThreejsExamples/Media",
-  "default_markdown":"Coding Standards.md",
+  "default_markdown":"Computer Fundamentals",
   "markdownFiles": [
     {
-      "group": "Basics",
-      "path": "./ThreejsExamples/Basics",
+      "group": "Chapter 01 -Basics",
+      "path": "./ThreejsExamples/01-Basics",
       "files": [
         {
-          "fileName": "Coding Standards.md",
-          "displayName": "Coding Standards"
+          "fileName": "Computer Fundamentals.md",
+          "displayName": "01. Computer Fundamentals"
         },
         {
           "fileName": "Commonly Used Types.md",
-          "displayName": "Commonly Used Types"
+          "displayName": "02. Commonly Used Types"
         }
       ]
     },
     {
-      "group": "Advanced",
-      "path": "./ThreejsExamples/Advance",
+      "group": "Chapter 02 -Advanced",
+      "path": "./ThreejsExamples/02-Advance",
       "files": [
         {
           "fileName": "C++ Style Guide.md",
-          "displayName": "C++ Style Guide ",
+          "displayName": "03. C++ Style Guide",
           "starterRepo": "https://github.com/maliaditya/ThreejsGuide",
           "finalRepo": "https://github.com/maliaditya/ThreejsGuide"
         }

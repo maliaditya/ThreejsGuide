@@ -1321,70 +1321,72 @@
     </div>
 
     <script>
-function getFileFromUrl() {
-    const hash = window.location.hash || '';
-    const m = hash.match(/file=([^&]+)/);
-    if (!m) return null;
-    try {
-        return decodeURIComponent(m[1]);
-    } catch {
-        return null;
-    }
-}
-let appConfig = {};
-
-function resolveDefaultMarkdown(cfg, name) {
-    if (!name) return null;
-
-    // Already a path → use directly
-    if (name.includes('/') || name.startsWith('./') || name.startsWith('../')) {
-        return name;
-    }
-
-    // Resolve from config file list
-    for (const group of (cfg.markdownFiles || [])) {
-        const gp = group.path
-            ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path)
-            : '';
-
-        for (const f of (group.files || [])) {
-            if (f.fileName === name || f.displayName === name) {
-                return gp ? `${gp}/${f.fileName}` : f.fileName;
+        function getFileFromUrl() {
+            const hash = window.location.hash || '';
+            const m = hash.match(/file=([^&]+)/);
+            if (!m) return null;
+            try {
+                return decodeURIComponent(m[1]);
+            } catch {
+                return null;
             }
         }
-    }
+        let appConfig = {};
 
-    return name;
-}
+        function resolveDefaultMarkdown(cfg, name) {
+            if (!name) return null;
 
-async function loadConfig() {
-    try {
-        const response = await fetch('config.json');
-        if (!response.ok) {
-            throw new Error('Failed to load config.json');
+            // Already a path → use directly
+            if (name.includes('/') || name.startsWith('./') || name.startsWith('../')) {
+                return name;
+            }
+
+            // Resolve from config file list
+            for (const group of (cfg.markdownFiles || [])) {
+                const gp = group.path
+                    ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path)
+                    : '';
+
+                for (const f of (group.files || [])) {
+                    if (f.fileName === name || f.displayName === name) {
+                        return gp ? `${gp}/${f.fileName}` : f.fileName;
+                    }
+                }
+            }
+
+            return name;
         }
 
-        const config = await response.json();
-        appConfig = config;
-        applyConfig(config);
+        async function loadConfig() {
+            try {
+                const response = await fetch('config.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load config.json');
+                }
 
-        // 🔥 URL HAS PRIORITY
-        const fileFromUrl = getFileFromUrl();
+                const config = await response.json();
+                appConfig = config;
+                applyConfig(config);
 
-        if (fileFromUrl) {
-            // Refresh or direct link
-            loadMarkdownFile(fileFromUrl);
-        } else {
-            // First visit only → default markdown
-            const resolvedDefault = resolveDefaultMarkdown(config, config.default_markdown);
-            if (resolvedDefault) {
-                loadMarkdownFile(resolvedDefault);
+                // 🔥 URL HAS PRIORITY
+                const fileFromUrl = getFileFromUrl();
+
+                if (fileFromUrl) {
+                    // Refresh or direct link
+                    loadMarkdownFile(fileFromUrl);
+                } else {
+                    // First visit only → default markdown
+                    const resolvedDefault = resolveDefaultMarkdown(config, config.default_markdown);
+                    if (resolvedDefault) {
+                        loadMarkdownFile(resolvedDefault);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading config:', error);
             }
         }
-    } catch (error) {
-        console.error('Error loading config:', error);
-    }
-}
+
+
         function applyConfig(config) {
             appConfig = config;
             if (appConfig.mediaPath) {
