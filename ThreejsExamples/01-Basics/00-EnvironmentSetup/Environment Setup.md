@@ -1,9 +1,7 @@
 # Web Runtime Environment 
 ---
 
-
-
-![[Media/Pasted image 20260101233752.png]]
+![[Pasted image 20260101233752.png]]
 
 ## **Project Initialization (npm + Vite)**
 

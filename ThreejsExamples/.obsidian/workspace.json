@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "index/docs/index.md",
+                "file": "01-Basics/00-EnvironmentSetup/Environment Setup.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "index"
+              "title": "Environment Setup"
             }
           }
         ]
@@ -183,11 +183,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "2520d2cb4ce8deed",
+  "active": "b043fb094a8c5b16",
   "lastOpenFiles": [
+    "index/docs/index.md",
     "index/docs/image.png",
     "index/docs/Pasted image 20260101233752.png",
-    "index/docs/index.md",
     "Media/Pasted image 20260101233752.png",
     "01-Basics/docs/Environment Setup.md",
     "01-Basics/docs/Triangle.md",
