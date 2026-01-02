@@ -183,8 +183,14 @@
       "bases:Create new base": false
     }
   },
-  "active": "2520d2cb4ce8deed",
+  "active": "b043fb094a8c5b16",
   "lastOpenFiles": [
+    "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup/script.js",
+    "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup/package-lock.json",
+    "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup/package.json",
+    "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup/index.html",
+    "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup",
+    "01-Basics/docs/default.md",
     "01-Basics/docs/Triangle.md",
     "01-Basics/docs/Environment Setup.md",
     "01-Basics/docs/Computer Fundamentals.md",
@@ -220,8 +226,6 @@
     "Welcome.md",
     "Media",
     "Advance/Commonly Used Types.md",
-    "Basics/C++ Style Guide.md",
-    "Advance",
-    "Basics"
+    "Basics/C++ Style Guide.md"
   ]
 }

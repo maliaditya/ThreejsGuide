@@ -16,7 +16,8 @@
       "files": [
          {
           "fileName": "Environment Setup.md",
-          "displayName": "00. Environment Setup"
+          "displayName": "00. Environment Setup",
+          "starterRepo": "https://github.com/maliaditya/ThreejsGuide/tree/main/ThreejsExamples/01-Basics/00-EnvironmentSetup"
         },
          {
           "fileName": "Triangle.md",
@@ -36,8 +37,8 @@
         {
           "fileName": "C++ Style Guide.md",
           "displayName": "03. C++ Style Guide",
-          "starterRepo": "https://github.com/maliaditya/ThreejsGuide",
-          "finalRepo": "https://github.com/maliaditya/ThreejsGuide"
+          "starterRepo": "https://github.com/maliaditya/ThreejsGuide/tree/main/ThreejsExamples/01-Basics/00-EnvironmentSetup",
+          "finalRepo": "https://github.com/maliaditya/ThreejsGuide/tree/main/ThreejsExamples/01-Basics/00-EnvironmentSetup"
         }
       ]
     }

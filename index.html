@@ -1590,13 +1590,29 @@
                 } catch (e) { return null; }
             }
 
-            async function downloadRepoZip(url) {
-                const info = parseGitHubRepo(url);
-                if (!info) { window.open(url, '_blank'); return; }
-                let branch = info.branch || await getDefaultBranch(info.owner, info.repo) || 'main';
-                const zipUrl = `https://github.com/${info.owner}/${info.repo}/archive/refs/heads/${branch}.zip`;
-                window.open(zipUrl, '_blank');
+            function downloadGitHubDirectory(treeUrl) {
+                const downloadUrl =
+                    'https://download-directory.github.io/?url=' +
+                    encodeURIComponent(treeUrl);
+
+                const width = 520; 
+                const height = 620;
+                // Calculate center position
+                const left = window.screenX + (window.outerWidth  - width)  / 2;
+                const top  = window.screenY + (window.outerHeight - height) / 2;
+
+                const w = window.open(
+                    downloadUrl,
+                    '_blank',
+                    `width=${width},height=${height},left=${left},top=${top}`
+                );
+
+                // Best-effort auto-close (may fail due to cross-origin)
+                setTimeout(() => {
+                    try { w && w.close(); } catch {}
+                }, 4000);
             }
+
 
             function addActionLink(href, label, opts = {}) {
                 const el = document.createElement('a');
@@ -1637,7 +1653,7 @@ if (starter) {
     btnStarter.textContent = 'Starter Code';
     btnStarter.addEventListener('click', (e) => {
         e.preventDefault();
-        downloadRepoZip(starter);
+        downloadGitHubDirectory(starter);
     });
     buttonGroup.appendChild(btnStarter);
 }
@@ -1648,7 +1664,7 @@ if (finalc) {
     btnFinal.textContent = 'Final Code';
     btnFinal.addEventListener('click', (e) => {
         e.preventDefault();
-        downloadRepoZip(finalc);
+        downloadGitHubDirectory(finalc);
     });
     buttonGroup.appendChild(btnFinal);
 }
