@@ -1,6 +1,5 @@
 > <h3 style="text-align:center;">Chapter 01: Basics</h3>
 
-
 <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; text-align:left;">
   <thead>
     <tr>
@@ -16,7 +15,7 @@
       <td>1</td>
       <td>Introduction to Web Runtime Environment</td>
       <td>
-        <img src="../../Media/Pasted image 20260101233752.png" width="220" style="display:block;margin:auto;border-radius:8px"/>
+        <img src="../../Media/Pasted image 20260101021050.png" width="220" style="display:block;margin:auto;border-radius:8px"/>
       </td>
       <td>Easy</td>
       <td>Open</td>

@@ -8,7 +8,7 @@
     "theme": "github-dark"
   },
   "mediaPath": "./ThreejsExamples/Media",
-  "default_markdown":"INDEX",
+  "default_markdown":"Contents",
   "markdownFiles": [
     {
       "group": "Chapter 01 -Basics",
