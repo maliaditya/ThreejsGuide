@@ -11,7 +11,7 @@
   "default_markdown":"Contents",
   "markdownFiles": [
      {
-      "group": "Contents",
+      "group": "THREE.js Guide",
       "path": "./ThreejsExamples/index/docs/",
       "files": [
         {
