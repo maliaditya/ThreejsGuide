@@ -27,12 +27,13 @@
       "files": [
          {
           "fileName": "Environment Setup.md",
-          "displayName": "00. Environment Setup",
-          "starterRepo": "https://github.com/maliaditya/ThreejsGuide/tree/main/ThreejsExamples/01-Basics/00-EnvironmentSetup"
+          "displayName": "00. Environment Setup"
         },
          {
           "fileName": "Triangle.md",
-          "displayName": "01. Triangle"
+          "displayName": "01. Triangle",
+          "starterRepo": "",
+          "finalRepo": ""
         }
        
       ]
