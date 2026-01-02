@@ -1237,6 +1237,42 @@
     }
 }
 
+/* Absolute centering for heading-only slides */
+.slide-heading-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    text-align: center;
+    width: 100%;
+}
+
+/* 🔥 FIX: give slide a real height */
+/* Make slide layout predictable */
+
+/* Define the usable slide area explicitly */
+#slide-content {
+    position: absolute;
+    top: 60px;      /* below close button */
+    bottom: 60px;   /* above controls */
+    left: 24px;
+    right: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Only affect heading-only slides */
+#slide-content > h1:only-child,
+#slide-content > h2:only-child,
+#slide-content > h3:only-child {
+    margin: 0;
+}
+
+
     </style>
 </head>
 <body>
@@ -1574,6 +1610,7 @@
                 return el;
             }
 
+
             function addDownloadButton(repoUrl) {
                 const info = parseGitHubRepo(repoUrl);
                 const btn = document.createElement('button');
@@ -1835,6 +1872,7 @@ container.setAttribute('aria-hidden', 'false');
             });
             generateTOC();
             buildSlides();
+            centerHeadingOnlySlide();
             attachYouTubePlayers();
         }
 
@@ -2107,26 +2145,106 @@ container.setAttribute('aria-hidden', 'false');
         // --- Slide mode functionality ---
         let slides = [];
         let currentSlide = 0;
+        
+        function isHeadingOnly(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html.trim();
 
+            const children = Array.from(temp.children);
+
+            // exactly one element and it is a heading
+            return (
+                children.length === 1 &&
+                /^H[1-3]$/.test(children[0].tagName)
+            );
+        }
         function buildSlides() {
             slides = [];
             const preview = document.getElementById('preview');
             if (!preview) return;
+
             const headers = Array.from(preview.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+
+            // No headers → single slide
             if (headers.length === 0) {
                 slides = [{ id: null, html: preview.innerHTML }];
                 return;
             }
+
             headers.forEach(header => {
                 let html = header.outerHTML;
                 let el = header.nextElementSibling;
+
+                let hasContent = false; // 👈 track real content
+
                 while (el && !(el.tagName && /^H[1-6]$/.test(el.tagName))) {
+                    // ignore empty elements
+                    const text = el.textContent?.trim();
+                    if (text || el.querySelector('*')) {
+                        hasContent = true;
+                    }
+
                     html += el.outerHTML;
                     el = el.nextElementSibling;
                 }
-                slides.push({ id: header.id || null, html });
+
+                // 🔥 SKIP heading-only slides
+                if (!hasContent) {
+                    return;
+                }
+
+                slides.push({
+                    id: header.id || null,
+                    html
+                });
             });
         }
+
+        function markHeadingOnlySlides() {
+            const slideContainer = document.getElementById('slide-content');
+            if (!slideContainer) return;
+
+            const slides = Array.from(slideContainer.children);
+
+            slides.forEach(slide => {
+                if (!(slide instanceof HTMLElement)) return;
+
+                const headings = slide.querySelectorAll('h1, h2, h3');
+                const otherContent = slide.querySelectorAll(
+                    'p, ul, ol, pre, code, img, video, iframe, blockquote'
+                );
+
+                // reset (important when navigating slides)
+                slide.classList.remove('slide-heading-only');
+
+                if (headings.length === 1 && otherContent.length === 0) {
+                    slide.classList.add('slide-heading-only');
+                }
+            });
+        }
+        function centerHeadingOnlySlide() {
+            const slideContent = document.getElementById('slide-content');
+            if (!slideContent) return;
+
+            const children = Array.from(slideContent.children);
+
+            // only one element AND it's a heading
+            if (children.length === 1 && /^H[1-3]$/.test(children[0].tagName)) {
+                const heading = children[0];
+
+                // reset previous
+                heading.classList.remove('slide-heading-center');
+
+                // make parent positioning context
+                slideContent.style.position = 'relative';
+                slideContent.style.minHeight = '100%';
+
+                heading.classList.add('slide-heading-center');
+            }
+        }
+
+
+                
 
         function openSlides(startIndex = 0) {
             const overlay = document.getElementById('slides-overlay');

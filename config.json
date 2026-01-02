@@ -14,14 +14,19 @@
       "group": "Chapter 01 -Basics",
       "path": "./ThreejsExamples/01-Basics",
       "files": [
-        {
-          "fileName": "Computer Fundamentals.md",
-          "displayName": "01. Computer Fundamentals"
+         {
+          "fileName": "/00-EnvironmentSetup/Environment Setup.md",
+          "displayName": "00. Environment Setup"
+        },
+         {
+          "fileName": "Triangle.md",
+          "displayName": "01. Triangle"
         },
         {
-          "fileName": "Commonly Used Types.md",
-          "displayName": "02. Commonly Used Types"
+          "fileName": "Computer Fundamentals.md",
+          "displayName": "02. Computer Fundamentals"
         }
+       
       ]
     },
     {
