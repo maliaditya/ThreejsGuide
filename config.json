@@ -10,6 +10,17 @@
   "mediaPath": "./ThreejsExamples/Media",
   "default_markdown":"Contents",
   "markdownFiles": [
+     {
+      "group": "Contents",
+      "path": "./ThreejsExamples/index/docs/",
+      "files": [
+        {
+          "fileName": "index.md",
+          "displayName": "Contents"
+        
+        }
+      ]
+    },
     {
       "group": "Chapter 01 -Basics",
       "path": "./ThreejsExamples/01-Basics/docs/",
@@ -26,16 +37,6 @@
        
       ]
     },
-    {
-      "group": "Contents",
-      "path": "./ThreejsExamples/index/docs/",
-      "files": [
-        {
-          "fileName": "index.md",
-          "displayName": "Contents"
-        
-        }
-      ]
-    }
+   
   ]
 } 
