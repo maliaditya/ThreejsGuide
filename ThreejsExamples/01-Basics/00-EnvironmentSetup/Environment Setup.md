@@ -1,6 +1,10 @@
 # Web Runtime Environment 
 ---
 
+
+
+![[Media/Pasted image 20260101233752.png]]
+
 ## **Project Initialization (npm + Vite)**
 
 ### Create a new folder
@@ -228,9 +232,6 @@ web-runtime/
   * Tracks window size
   * Handles high-DPI displays
   * Keeps the canvas in sync with the browser
-
-
-
 
 
 

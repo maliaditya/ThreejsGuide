@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "01-Basics/00-EnvironmentSetup/Environment Setup.md",
+                "file": "index/docs/index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Environment Setup"
+              "title": "index"
             }
           }
         ]
@@ -183,9 +183,19 @@
       "bases:Create new base": false
     }
   },
-  "active": "b043fb094a8c5b16",
+  "active": "2520d2cb4ce8deed",
   "lastOpenFiles": [
+    "index/docs/image.png",
+    "index/docs/Pasted image 20260101233752.png",
     "index/docs/index.md",
+    "Media/Pasted image 20260101233752.png",
+    "01-Basics/docs/Environment Setup.md",
+    "01-Basics/docs/Triangle.md",
+    "01-Basics/docs/Computer Fundamentals.md",
+    "01-Basics/00-EnvironmentSetup/Environment Setup.md",
+    "01-Basics/docs/C++ Style Guide.md",
+    "index/docs/images/Pasted image 20260101233752.png",
+    "index/docs/images",
     "index/docs/Chapter01.md",
     "index/docs/default.md",
     "index/docs",
@@ -197,38 +207,28 @@
     "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup/package.json",
     "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup/index.html",
     "01-Basics/00-EnvironmentSetup/00-EnvironmentSetup",
-    "01-Basics/docs/Triangle.md",
-    "01-Basics/docs/Environment Setup.md",
-    "01-Basics/docs/Computer Fundamentals.md",
     "01-Basics/docs",
     "01-Basics/doc/Triangle.md",
     "01-Basics/Computer Fundamentals.md",
     "01-Basics/doc/Computer Fundamentals.md",
     "01-Basics/doc/Environment Setup.md",
     "01-Basics/doc",
-    "01-Basics/00-EnvironmentSetup/Environment Setup.md",
     "01-Basics/Environment Setup.md",
     "02-Advance/C++ Style Guide.md",
     "01-Basics/Triangle.md",
-    "Media/Pasted image 20260101233752.png",
     "01-Basics/Fundamentals.md",
     "Media/Pasted image 20260101101651.png",
     "Media/Pasted image 20260101100515.png",
     "Media/Pasted image 20260101093156.png",
-    "Untitled.base",
     "Media/Gemini_Generated_Image_wegvw5wegvw5wegv.png",
     "Media/Firefly_Gemini Flash_remove texture units from this  image 54374.png",
     "Media/Pasted Image 20251227102942_015.png",
-    "Media/Pasted image 20260101085201.png",
     "01-Basics/Commonly Used Types.md",
-    "Media/Pasted image 20260101021050.png",
-    "Media/Pasted image 20260101084912.png",
     "Advance/C++ Style Guide.md",
     "().md",
     "Basics/Coding Standards.md",
     "Basics/Commonly Used Types.md",
     "Welcome.md",
-    "Advance/Commonly Used Types.md",
-    "Basics/C++ Style Guide.md"
+    "Advance/Commonly Used Types.md"
   ]
 }

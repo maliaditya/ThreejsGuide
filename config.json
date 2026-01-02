@@ -7,7 +7,7 @@
     "issueNumber": null,
     "theme": "github-dark"
   },
-  "mediaPath": "./ThreejsExamples/Media",
+  "mediaPath": "/ThreejsExamples/Media",
   "default_markdown":"Contents",
   "markdownFiles": [
      {
@@ -31,11 +31,16 @@
         },
          {
           "fileName": "Triangle.md",
-          "displayName": "01. Triangle",
+          "displayName": "01. RGB-Triangle",
+          "starterRepo": "",
+          "finalRepo": ""
+        },
+        {
+          "fileName": "Computer Fundamentals.md",
+          "displayName": "03. Computer Fundamentals",
           "starterRepo": "",
           "finalRepo": ""
         }
-       
       ]
     }
    

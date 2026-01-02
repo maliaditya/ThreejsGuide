@@ -21,23 +21,24 @@
     <tr style="border-bottom:1px solid #333;">
       <td>00</td>
       <td>Environment Setup</td>
-      <td style="text-align:left;">
+      <td style="text-align:center;">
         <img
-          src="../ThreejsExamples/Media/Pasted image 20260101233752.png"
+          src="https://github.com/maliaditya/ThreejsGuide/blob/main/ThreejsExamples/Media/Pasted%20image%2020260101233752.png?raw=true"
           width="220"
           height="140"
           style="display:block;margin:auto;border-radius:8px;object-fit:cover;"
           alt="Environment Setup Preview"
         />
       </td>
- <td>
-  <a
-    href="https://maliaditya.github.io/ThreejsGuide/#file=.%2FThreejsExamples%2F01-Basics%2Fdocs%2FEnvironment%20Setup.md"
-    target="_blank"
-    rel="noopener"
-  >
-    Open
-  </a></td>
+      <td>
+        <a
+          href="https://maliaditya.github.io/ThreejsGuide/#file=.%2FThreejsExamples%2F01-Basics%2Fdocs%2FEnvironment%20Setup.md"
+          target="_blank"
+          rel="noopener"
+        >
+          Open
+        </a>
+      </td>
     </tr>
   </tbody>
 </table>
