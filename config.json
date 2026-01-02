@@ -12,10 +12,10 @@
   "markdownFiles": [
     {
       "group": "Chapter 01 -Basics",
-      "path": "./ThreejsExamples/01-Basics",
+      "path": "./ThreejsExamples/01-Basics/docs/",
       "files": [
          {
-          "fileName": "/00-EnvironmentSetup/Environment Setup.md",
+          "fileName": "Environment Setup.md",
           "displayName": "00. Environment Setup"
         },
          {
