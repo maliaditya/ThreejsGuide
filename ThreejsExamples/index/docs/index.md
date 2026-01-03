@@ -33,7 +33,6 @@
       <td>
         <a
           href="https://maliaditya.github.io/ThreejsGuide/#file=.%2FThreejsExamples%2F01-Basics%2Fdocs%2FEnvironment%20Setup.md"
-          target="_blank"
           rel="noopener"
         >
           Open
