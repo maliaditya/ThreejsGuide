@@ -21,16 +21,6 @@
   "default_markdown": "Contents",
   "markdownFiles": [
     {
-      "group": "THREE.js Guide",
-      "path": "./ThreejsExamples/index/docs/",
-      "files": [
-        {
-          "fileName": "index.md",
-          "displayName": "Contents"
-        }
-      ]
-    },
-    {
       "group": "Chapter 01 -Basics",
       "path": "./ThreejsExamples/Chapter-01-Basics/docs/",
       "files": [
@@ -58,6 +48,17 @@
           "fileName": "shadows.md",
           "displayName": "Shadows",
           "sequence": 4
+        }
+      ]
+    },
+    {
+      "group": "THREE.js Guide",
+      "path": "./ThreejsExamples/Three-Js-Guide/docs/",
+      "files": [
+        {
+          "fileName": "contents.md",
+          "displayName": "Contents",
+          "sequence": 0
         }
       ]
     }
