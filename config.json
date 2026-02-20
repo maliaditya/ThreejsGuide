@@ -23,12 +23,8 @@
     {
       "group": "Chapter 01 -Basics",
       "path": "./ThreejsExamples/Chapter-01-Basics/docs/",
+      "sequence": 1,
       "files": [
-        {
-          "fileName": "environment-setup.md",
-          "displayName": "00. Environment Setup",
-          "sequence": 0
-        },
         {
           "fileName": "rgb-triangle.md",
           "displayName": "01. RGB-Triangle",
@@ -48,12 +44,18 @@
           "fileName": "shadows.md",
           "displayName": "Shadows",
           "sequence": 4
+        },
+        {
+          "fileName": "environment-setup.md",
+          "displayName": "00. Environment Setup",
+          "sequence": 0
         }
       ]
     },
     {
       "group": "THREE.js Guide",
       "path": "./ThreejsExamples/Three-Js-Guide/docs/",
+      "sequence": 0,
       "files": [
         {
           "fileName": "contents.md",
