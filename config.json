@@ -7,6 +7,12 @@
     "issueNumber": null,
     "theme": "github-dark"
   },
+  "studioAuth": {
+    "enabled": true,
+    "supabaseUrl": "https://lftffpuicrmcufnsiwci.supabase.co",
+    "supabaseAnonKey": "sb_publishable_oHT1dePNIVzWCAVLoUce2g_mFUl8j0b",
+    "allowedEmail": "adityamali33@gmail.com"
+  },
   "mediaPath": "/ThreejsExamples/Media",
   "default_markdown":"Contents",
   "markdownFiles": [
