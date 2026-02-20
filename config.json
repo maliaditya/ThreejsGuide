@@ -21,48 +21,44 @@
   "default_markdown": "Contents",
   "markdownFiles": [
     {
-      "group": "THREE.js Guide",
-      "path": "./ThreejsExamples/index/docs/",
-      "files": [
-        {
-          "fileName": "index.md",
-          "displayName": "Contents"
-        }
-      ]
-    },
-    {
-      "group": "Chapter 01 -Basics",
-      "path": "./ThreejsExamples/01-Basics/docs/",
-      "files": [
-        {
-          "fileName": "Environment Setup.md",
-          "displayName": "00. Environment Setup"
-        },
-        {
-          "fileName": "Triangle.md",
-          "displayName": "01. RGB-Triangle",
-          "starterRepo": "",
-          "finalRepo": ""
-        },
-        {
-          "fileName": "Computer Fundamentals.md",
-          "displayName": "03. Computer Fundamentals",
-          "starterRepo": "",
-          "finalRepo": ""
-        }
-      ]
-    },
-    {
       "group": "Chapter 01 -Basics",
       "path": "./ThreejsExamples/Chapter-01-Basics/docs/",
       "files": [
         {
-          "fileName": "shadows.md",
-          "displayName": "Shadows"
+          "fileName": "environment-setup.md",
+          "displayName": "00. Environment Setup",
+          "sequence": 0
+        },
+        {
+          "fileName": "rgb-triangle.md",
+          "displayName": "01. RGB-Triangle",
+          "sequence": 1
+        },
+        {
+          "fileName": "computer-fundamentals.md",
+          "displayName": "03. Computer Fundamentals",
+          "sequence": 2
         },
         {
           "fileName": "lights.md",
-          "displayName": "Lights"
+          "displayName": "Lights",
+          "sequence": 3
+        },
+        {
+          "fileName": "shadows.md",
+          "displayName": "Shadows",
+          "sequence": 4
+        }
+      ]
+    },
+    {
+      "group": "THREE.js Guide",
+      "path": "./ThreejsExamples/Three-Js-Guide/docs/",
+      "files": [
+        {
+          "fileName": "contents.md",
+          "displayName": "Contents",
+          "sequence": 0
         }
       ]
     }
