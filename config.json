@@ -15,7 +15,7 @@
   },
   "githubPublish": {
     "enabled": true,
-    "apiUrl": "http://127.0.0.1:8787/api/github/publish"
+    "apiUrl": "/api/github/publish"
   },
   "mediaPath": "/ThreejsExamples/Media",
   "default_markdown":"Contents",
