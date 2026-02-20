@@ -2919,6 +2919,10 @@
             supabaseAnonKey: '',
             allowedEmail: ''
         };
+        const DEFAULT_GITHUB_PUBLISH = {
+            enabled: false,
+            apiUrl: 'http://127.0.0.1:8787/api/github/publish'
+        };
         let appConfig = {};
         let studioContentMap = {};
         let studioVisualEditEnabled = false;
@@ -2979,11 +2983,81 @@
             }));
             if (!cfg.utterances || typeof cfg.utterances !== 'object') cfg.utterances = {};
             cfg.studioAuth = Object.assign({}, DEFAULT_STUDIO_AUTH, cfg.studioAuth || {});
+            cfg.githubPublish = Object.assign({}, DEFAULT_GITHUB_PUBLISH, cfg.githubPublish || {});
             return cfg;
         }
 
         function getStudioAuthConfig() {
             return Object.assign({}, DEFAULT_STUDIO_AUTH, (appConfig && appConfig.studioAuth) || {});
+        }
+
+        function getGitHubPublishConfig() {
+            return Object.assign({}, DEFAULT_GITHUB_PUBLISH, (appConfig && appConfig.githubPublish) || {});
+        }
+
+        function toRepoRelativePath(path) {
+            let p = (path || '').trim();
+            if (!p) return '';
+            p = p.replace(/\\/g, '/');
+            p = p.replace(/^\.\/+/, '');
+            p = p.replace(/^\/+/, '');
+            return p;
+        }
+
+        function buildPublishPayload(resolvedPath, markdownText) {
+            const filePath = toRepoRelativePath(resolvedPath);
+            if (!filePath) return null;
+            return {
+                message: `Studio publish: ${filePath}`,
+                files: [
+                    {
+                        path: 'config.json',
+                        content: JSON.stringify(sanitizeConfigShape(appConfig), null, 2)
+                    },
+                    {
+                        path: filePath,
+                        content: markdownText || ''
+                    }
+                ]
+            };
+        }
+
+        async function publishStudioToGitHub(resolvedPath, markdownText) {
+            const cfg = getGitHubPublishConfig();
+            if (!cfg.enabled) {
+                return { ok: false, skipped: true, reason: 'GitHub publish is disabled in config.githubPublish.enabled' };
+            }
+            const apiUrl = (cfg.apiUrl || '').trim();
+            if (!apiUrl) {
+                return { ok: false, skipped: true, reason: 'Missing config.githubPublish.apiUrl' };
+            }
+            const payload = buildPublishPayload(resolvedPath, markdownText);
+            if (!payload) {
+                return { ok: false, skipped: true, reason: 'Could not build publish payload' };
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const body = await response.json().catch(() => ({}));
+                if (!response.ok || !body.ok) {
+                    return {
+                        ok: false,
+                        skipped: false,
+                        reason: (body && body.error) || `GitHub publish failed (HTTP ${response.status})`
+                    };
+                }
+                return { ok: true, details: body };
+            } catch (err) {
+                return {
+                    ok: false,
+                    skipped: false,
+                    reason: `Cannot reach publish server at ${apiUrl}. Start github-publish-server.mjs.`
+                };
+            }
         }
 
         function isAllowedStudioUser(userEmail, allowedEmail) {
@@ -3728,9 +3802,7 @@ container.setAttribute('aria-hidden', 'false');
             processed = rewriteYouTubeEmbeds(processed);
             previewArea.innerHTML = md.render(processed);
             enhancePublishedEmbeds(previewArea);
-            document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightElement(block);
-            });
+            safeHighlightCodeBlocks(previewArea);
             generateTOC();
             buildSlides();
             attachYouTubePlayers();
@@ -3741,6 +3813,15 @@ container.setAttribute('aria-hidden', 'false');
                 .replace(/[^\w\s-]/g, '')
                 .replace(/\s+/g, '-')
                 .replace(/-+/g, '-');
+        }
+
+        function safeHighlightCodeBlocks(root) {
+            const scope = root || document;
+            scope.querySelectorAll('pre code').forEach((block) => {
+                if (block.children && block.children.length > 0) return;
+                if (block.classList.contains('hljs')) return;
+                hljs.highlightElement(block);
+            });
         }
 
         /* YouTube IFrame API-based fallback handler */
@@ -4133,7 +4214,7 @@ container.setAttribute('aria-hidden', 'false');
             if (nextBtn) nextBtn.disabled = currentSlide === slides.length - 1;
             updateSlideCounters();
             // ensure syntax highlighting inside slide
-            content.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+            safeHighlightCodeBlocks(content);
         }
 
         function nextSlide() {
@@ -4233,7 +4314,7 @@ container.setAttribute('aria-hidden', 'false');
             if (nextBtn) nextBtn.disabled = currentSlide === slides.length - 1;
             updateSlideCounters();
             // ensure syntax highlighting inside slide
-            content.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+            safeHighlightCodeBlocks(content);
         }
 
         function nextSlideInline() { if (currentSlide < slides.length - 1) { currentSlide++; updateSlideInline(); } }
@@ -4298,7 +4379,7 @@ container.setAttribute('aria-hidden', 'false');
             });
             const processed = studioRewriteImagePaths(markdownText || '');
             out.innerHTML = md.render(processed);
-            out.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+            safeHighlightCodeBlocks(out);
             out.contentEditable = studioVisualEditEnabled ? 'true' : 'false';
             out.classList.toggle('visual-edit', !!studioVisualEditEnabled);
             enhanceStudioEmbeds(out);
@@ -5199,8 +5280,15 @@ container.setAttribute('aria-hidden', 'false');
                 const editor = document.getElementById('studio-markdown-editor');
                 studioContentMap[path] = editor ? editor.value : '';
                 persistStudioState();
+                const publishResult = await publishStudioToGitHub(path, studioContentMap[path]);
                 await loadMarkdownFile(path);
-                studioSetStatus(`Published ${path}.`);
+                if (publishResult.ok) {
+                    studioSetStatus(`Published ${path} to GitHub.`);
+                } else if (publishResult.skipped) {
+                    studioSetStatus(`Published locally only: ${publishResult.reason}`);
+                } else {
+                    studioSetStatus(`Local publish done, GitHub failed: ${publishResult.reason}`, true);
+                }
             });
 
             document.getElementById('studio-download-markdown').addEventListener('click', () => {

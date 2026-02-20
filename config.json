@@ -13,6 +13,10 @@
     "supabaseAnonKey": "sb_publishable_oHT1dePNIVzWCAVLoUce2g_mFUl8j0b",
     "allowedEmail": "adityamali33@gmail.com"
   },
+  "githubPublish": {
+    "enabled": true,
+    "apiUrl": "http://127.0.0.1:8787/api/github/publish"
+  },
   "mediaPath": "/ThreejsExamples/Media",
   "default_markdown":"Contents",
   "markdownFiles": [

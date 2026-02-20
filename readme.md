@@ -112,3 +112,43 @@ If you enjoy this project and would like to support my work, feel free to check 
 
 - [Buy Me a Coffee](https://www.buymeacoffee.com/adityamali98)
 - [GFX Programming YouTube Channel](https://www.youtube.com/@GFX-Programming)
+# GitHub Publish (Studio)
+
+Studio can publish real files to GitHub through a local proxy server.
+
+## 1) Configure app
+
+In `config.json`:
+
+```json
+"githubPublish": {
+  "enabled": true,
+  "apiUrl": "http://127.0.0.1:8787/api/github/publish"
+}
+```
+
+## 2) Configure server env
+
+Copy `.env.example` values into your environment:
+
+- `GITHUB_OWNER`
+- `GITHUB_REPO`
+- `GITHUB_BRANCH` (optional, default `main`)
+- `GITHUB_TOKEN` (repo write access)
+- `PORT` (optional, default `8787`)
+
+## 3) Run proxy server
+
+```bash
+node github-publish-server.mjs
+```
+
+## 4) Publish from Studio
+
+Click `Publish Lesson` in Studio.
+
+It commits:
+- `config.json`
+- current lesson markdown file
+
+If server is not running or env is missing, Studio will keep local save and show an error in status.
