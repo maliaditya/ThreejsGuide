@@ -372,6 +372,30 @@
             border: 1px solid #44475a;
             font-size: 0.98em;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .code-copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 2;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(148,163,184,0.42);
+            background: rgba(15,23,42,0.86);
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .code-copy-btn:hover {
+            border-color: rgba(168,85,247,0.8);
         }
 
         .token.comment,
@@ -3946,6 +3970,7 @@ container.setAttribute('aria-hidden', 'false');
             previewArea.innerHTML = md.render(processed);
             enhancePublishedEmbeds(previewArea);
             safeHighlightCodeBlocks(previewArea);
+            attachCodeCopyButtons(previewArea);
             generateTOC();
             buildSlides();
             attachYouTubePlayers();
@@ -3964,6 +3989,53 @@ container.setAttribute('aria-hidden', 'false');
                 if (block.children && block.children.length > 0) return;
                 if (block.classList.contains('hljs')) return;
                 hljs.highlightElement(block);
+            });
+        }
+
+        async function copyTextToClipboard(text) {
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+            } catch (e) {}
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                const ok = document.execCommand('copy');
+                ta.remove();
+                return !!ok;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function attachCodeCopyButtons(root) {
+            const scope = root || document;
+            scope.querySelectorAll('pre').forEach((pre) => {
+                const code = pre.querySelector('code');
+                if (!code) return;
+                if (pre.querySelector('.code-copy-btn')) return;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'code-copy-btn';
+                btn.title = 'Copy code';
+                btn.setAttribute('aria-label', 'Copy code');
+                btn.textContent = '⧉';
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const ok = await copyTextToClipboard(code.innerText || code.textContent || '');
+                    const original = btn.textContent;
+                    btn.textContent = ok ? '✓' : '!';
+                    setTimeout(() => { btn.textContent = original; }, 900);
+                });
+                pre.appendChild(btn);
             });
         }
 
@@ -4126,46 +4198,57 @@ container.setAttribute('aria-hidden', 'false');
         }
 
         let tocProgressRaf = null;
-        function setupTocScrollProgress(headers) {
+        let tocProgressHeaders = [];
+        let tocProgressScrollContainer = null;
+        let tocProgressBound = false;
+
+        function applyTocProgressState() {
+            tocProgressRaf = null;
             const tocListElement = document.getElementById('toc-list');
-            const contentEl = document.getElementById('content');
-            if (!tocListElement || !headers || headers.length === 0 || !contentEl) return;
-
+            if (!tocListElement) return;
             const links = Array.from(tocListElement.querySelectorAll('a[href^="#"]'));
-            if (!links.length) return;
+            if (!links.length || !tocProgressHeaders.length) return;
 
-            const updateProgress = () => {
-                tocProgressRaf = null;
-                let activeIndex = 0;
-                const threshold = 120;
+            let activeIndex = 0;
+            const threshold = 120;
+            for (let i = 0; i < tocProgressHeaders.length; i++) {
+                const rect = tocProgressHeaders[i].getBoundingClientRect();
+                if (rect.top <= threshold) activeIndex = i;
+                else break;
+            }
 
-                for (let i = 0; i < headers.length; i++) {
-                    const rect = headers[i].getBoundingClientRect();
-                    if (rect.top <= threshold) {
-                        activeIndex = i;
-                    } else {
-                        break;
-                    }
-                }
+            links.forEach((link, idx) => {
+                const li = link.closest('li');
+                if (!li) return;
+                li.classList.toggle('active', idx === activeIndex);
+                li.classList.toggle('completed', idx < activeIndex);
+            });
+        }
 
-                links.forEach((link, idx) => {
-                    const li = link.closest('li');
-                    if (!li) return;
-                    li.classList.toggle('active', idx === activeIndex);
-                    li.classList.toggle('completed', idx < activeIndex);
-                });
-            };
+        function requestTocProgressUpdate() {
+            if (tocProgressRaf !== null) return;
+            tocProgressRaf = window.requestAnimationFrame(applyTocProgressState);
+        }
 
-            const requestUpdate = () => {
-                if (tocProgressRaf !== null) return;
-                tocProgressRaf = window.requestAnimationFrame(updateProgress);
-            };
+        function setupTocScrollProgress(headers) {
+            tocProgressHeaders = Array.isArray(headers) ? headers.slice() : [];
+            const contentEl = document.getElementById('content');
+            if (!contentEl || !tocProgressHeaders.length) return;
 
-            contentEl.removeEventListener('scroll', requestUpdate);
-            window.removeEventListener('scroll', requestUpdate);
-            contentEl.addEventListener('scroll', requestUpdate, { passive: true });
-            window.addEventListener('scroll', requestUpdate, { passive: true });
-            requestUpdate();
+            if (tocProgressScrollContainer && tocProgressScrollContainer !== contentEl) {
+                tocProgressScrollContainer.removeEventListener('scroll', requestTocProgressUpdate);
+                tocProgressScrollContainer = null;
+            }
+            if (!tocProgressBound) {
+                window.addEventListener('scroll', requestTocProgressUpdate, { passive: true });
+                window.addEventListener('resize', requestTocProgressUpdate, { passive: true });
+                tocProgressBound = true;
+            }
+            if (!tocProgressScrollContainer) {
+                tocProgressScrollContainer = contentEl;
+                tocProgressScrollContainer.addEventListener('scroll', requestTocProgressUpdate, { passive: true });
+            }
+            requestTocProgressUpdate();
         }
 
         function generateTOC() {
@@ -4358,6 +4441,7 @@ container.setAttribute('aria-hidden', 'false');
             updateSlideCounters();
             // ensure syntax highlighting inside slide
             safeHighlightCodeBlocks(content);
+            attachCodeCopyButtons(content);
         }
 
         function nextSlide() {
@@ -4458,6 +4542,7 @@ container.setAttribute('aria-hidden', 'false');
             updateSlideCounters();
             // ensure syntax highlighting inside slide
             safeHighlightCodeBlocks(content);
+            attachCodeCopyButtons(content);
         }
 
         function nextSlideInline() { if (currentSlide < slides.length - 1) { currentSlide++; updateSlideInline(); } }
@@ -4523,6 +4608,7 @@ container.setAttribute('aria-hidden', 'false');
             const processed = studioRewriteImagePaths(markdownText || '');
             out.innerHTML = md.render(processed);
             safeHighlightCodeBlocks(out);
+            attachCodeCopyButtons(out);
             out.contentEditable = studioVisualEditEnabled ? 'true' : 'false';
             out.classList.toggle('visual-edit', !!studioVisualEditEnabled);
             enhanceStudioEmbeds(out);
