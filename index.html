@@ -3260,6 +3260,10 @@
                 if (rawConfig && rawConfig.studioAuth) {
                     mergedConfig.studioAuth = rawConfig.studioAuth;
                 }
+                // Deployment source of truth: always take githubPublish from config.json
+                if (rawConfig && rawConfig.githubPublish) {
+                    mergedConfig.githubPublish = rawConfig.githubPublish;
+                }
                 const config = sanitizeConfigShape(mergedConfig);
                 studioContentMap = getStoredJson(STUDIO_CONTENT_KEY, {});
                 appConfig = config;
