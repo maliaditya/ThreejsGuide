@@ -2633,6 +2633,64 @@
     color: #ffffff;
 }
 
+/* Live page edit dock (visible for authenticated studio user) */
+.live-edit-dock {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 5000;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(148,163,184,0.32);
+    background: rgba(10, 15, 28, 0.94);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.34);
+}
+
+.live-edit-dock.open {
+    display: flex;
+}
+
+.live-edit-left,
+.live-edit-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.live-edit-dock button {
+    border: 1px solid rgba(148,163,184,0.34);
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.live-edit-dock button.good {
+    background: linear-gradient(90deg, #14b8a6, #34d399);
+    border-color: rgba(110,231,183,0.56);
+    color: #052e2b;
+}
+
+.live-edit-status {
+    color: #a5b4c9;
+    font-size: 0.82rem;
+    min-width: 160px;
+}
+
+#preview.live-visual-edit {
+    outline: 2px solid rgba(168,85,247,0.45);
+    outline-offset: -2px;
+}
+
 </style>
 </head>
 <body>
@@ -2695,6 +2753,29 @@
 
     <button id="slides-toggle" class="slides-btn" title="View as slides">View as slides</button>
     <button id="studio-open" class="studio-btn" title="Open Studio">Studio</button>
+
+    <div id="live-edit-dock" class="live-edit-dock" aria-hidden="true">
+        <div class="live-edit-left">
+            <button id="live-add-heading" type="button">+ Heading</button>
+            <button id="live-add-text" type="button">+ Text</button>
+            <button id="live-add-code" type="button">+ Code Block</button>
+            <button id="live-add-image" type="button">+ Image</button>
+            <button id="live-add-url" type="button">+ URL Link</button>
+            <button id="live-add-embed" type="button">+ Embed Link</button>
+            <button id="live-add-olist" type="button">+ Ordered List</button>
+            <button id="live-add-ulist" type="button">+ Unordered List</button>
+        </div>
+        <div class="live-edit-right">
+            <label style="display:flex;align-items:center;gap:8px;color:#dbeafe;font-size:0.86rem;">
+                <input id="live-visual-edit" type="checkbox">
+                Live Edit
+            </label>
+            <button id="live-open-studio" type="button">Studio</button>
+            <button id="live-save-draft" type="button">Save Draft</button>
+            <button id="live-publish" type="button" class="good">Publish</button>
+            <span id="live-edit-status" class="live-edit-status">Ready</span>
+        </div>
+    </div>
 
     <div id="toc-sidebar">
         <h3>Table of Contents</h3>
@@ -2812,6 +2893,10 @@
                             <div class="studio-field">
                                 <label for="studio-group-path">Group Path</label>
                                 <input id="studio-group-path" type="text">
+                            </div>
+                            <div class="studio-field">
+                                <label for="studio-group-sequence">Group Sequence</label>
+                                <input id="studio-group-sequence" type="number" min="0" step="1" placeholder="1">
                             </div>
                             <div class="studio-field">
                                 <label for="studio-file-name">Markdown File Name</label>
@@ -2934,6 +3019,9 @@
         let studioSupabaseClient = null;
         let studioSupabaseFingerprint = '';
         let studioAuthModalResolver = null;
+        let currentMarkdownRaw = '';
+        let liveVisualEditEnabled = false;
+        let livePreviewSyncTimer = null;
 
         function cloneJson(data) {
             return JSON.parse(JSON.stringify(data));
@@ -2983,6 +3071,7 @@
             cfg.markdownFiles = cfg.markdownFiles.map((g) => ({
                 group: g.group || 'New Group',
                 path: g.path || '',
+                sequence: Number.isFinite(Number(g.sequence)) ? Number(g.sequence) : undefined,
                 files: Array.isArray(g.files) ? g.files : []
             }));
             if (!cfg.utterances || typeof cfg.utterances !== 'object') cfg.utterances = {};
@@ -3140,7 +3229,10 @@
 
         async function ensureStudioAuthenticated() {
             const cfg = getStudioAuthConfig();
-            if (!cfg.enabled) return true;
+            if (!cfg.enabled) {
+                updateLiveEditDockVisibility();
+                return true;
+            }
 
             const client = getStudioSupabaseClient(cfg);
             if (!client) {
@@ -3154,6 +3246,7 @@
             const sessionResult = await client.auth.getSession();
             const sessionUser = sessionResult && sessionResult.data && sessionResult.data.session && sessionResult.data.session.user;
             if (sessionUser && isAllowedStudioUser(sessionUser.email, cfg.allowedEmail)) {
+                updateLiveEditDockVisibility();
                 return true;
             }
 
@@ -3187,6 +3280,7 @@
                     errorText = `Access denied. Allowed account: ${cfg.allowedEmail}`;
                     continue;
                 }
+                updateLiveEditDockVisibility();
                 return true;
             }
         }
@@ -3208,7 +3302,7 @@
 
         function getAllResolvedFiles() {
             const files = [];
-            for (const group of (appConfig.markdownFiles || [])) {
+            for (const group of sortGroups(appConfig.markdownFiles || [])) {
                 const gp = group.path
                     ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path)
                     : '';
@@ -3317,6 +3411,25 @@
             const gp = groupPath.endsWith('/') ? groupPath.slice(0, -1) : groupPath;
             const fn = fileName.startsWith('/') ? fileName.slice(1) : fileName;
             return gp + '/' + fn;
+        }
+
+        function getGroupSequenceValue(group) {
+            if (group && Number.isFinite(Number(group.sequence))) return Number(group.sequence);
+            const name = (group && group.group ? String(group.group) : '').trim();
+            const m = name.match(/^(\d+)[\s.\-_:)]*/);
+            if (m) return Number(m[1]);
+            return Number.POSITIVE_INFINITY;
+        }
+
+        function sortGroups(groups) {
+            return (groups || []).slice().sort((a, b) => {
+                const sa = getGroupSequenceValue(a);
+                const sb = getGroupSequenceValue(b);
+                if (sa !== sb) return sa - sb;
+                const ga = String((a && a.group) || '');
+                const gb = String((b && b.group) || '');
+                return ga.localeCompare(gb, undefined, { numeric: true, sensitivity: 'base' });
+            });
         }
 
         function getLessonSequenceValue(file) {
@@ -3579,7 +3692,7 @@ container.setAttribute('aria-hidden', 'false');
 
             // Support grouped format: [{ group: 'Basics', files: [...] }, ...]
             if (markdownFiles.length && markdownFiles[0].group && Array.isArray(markdownFiles[0].files)) {
-                markdownFiles.forEach(group => {
+                sortGroups(markdownFiles).forEach(group => {
                     const groupHeader = document.createElement('div');
                     groupHeader.className = 'guide-group-header';
 
@@ -3697,6 +3810,7 @@ container.setAttribute('aria-hidden', 'false');
                     }
                     text = await response.text();
                 }
+                currentMarkdownRaw = text || '';
                 renderMarkdown(text, fileName);
                 const preview = document.getElementById('preview');
                 if (preview) preview.classList.remove('is-loading');
@@ -4695,9 +4809,167 @@ container.setAttribute('aria-hidden', 'false');
             renderStudioMarkdownPreview(editor.value);
         }
 
+        function setLiveEditStatus(message, isError = false) {
+            const el = document.getElementById('live-edit-status');
+            if (!el) return;
+            el.textContent = message || '';
+            el.style.color = isError ? '#fca5a5' : '#a5b4c9';
+        }
+
+        function getCurrentLiveFilePath() {
+            return getSavedLastFile() || getFileFromUrl() || '';
+        }
+
+        function appendToCurrentMarkdown(snippet) {
+            const filePath = getCurrentLiveFilePath();
+            if (!filePath) {
+                setLiveEditStatus('No lesson selected.', true);
+                return;
+            }
+            const base = currentMarkdownRaw || '';
+            const prefix = base && !base.endsWith('\n') ? '\n' : '';
+            currentMarkdownRaw = `${base}${prefix}${snippet}`;
+            studioContentMap[filePath] = currentMarkdownRaw;
+            renderMarkdown(currentMarkdownRaw, filePath);
+            setLiveEditStatus('Updated live content.');
+        }
+
+        function setLiveVisualEditMode(enabled) {
+            liveVisualEditEnabled = !!enabled;
+            const preview = document.getElementById('preview');
+            const checkbox = document.getElementById('live-visual-edit');
+            if (checkbox) checkbox.checked = liveVisualEditEnabled;
+            if (!preview) return;
+            preview.contentEditable = liveVisualEditEnabled ? 'true' : 'false';
+            preview.classList.toggle('live-visual-edit', liveVisualEditEnabled);
+            if (!liveVisualEditEnabled) {
+                const filePath = getCurrentLiveFilePath();
+                if (filePath) renderMarkdown(currentMarkdownRaw || '', filePath);
+                setLiveEditStatus('Live edit off.');
+            } else {
+                setLiveEditStatus('Live edit on.');
+            }
+        }
+
+        function syncMarkdownFromLivePreview() {
+            if (!liveVisualEditEnabled) return;
+            const preview = document.getElementById('preview');
+            const filePath = getCurrentLiveFilePath();
+            if (!preview || !filePath) return;
+            const markdown = studioHtmlToMarkdown(preview.innerHTML);
+            if (markdown == null) {
+                setLiveEditStatus('Turndown missing for live edit sync.', true);
+                return;
+            }
+            currentMarkdownRaw = markdown;
+            studioContentMap[filePath] = markdown;
+        }
+
+        async function saveLiveDraft() {
+            syncMarkdownFromLivePreview();
+            const filePath = getCurrentLiveFilePath();
+            if (!filePath) {
+                setLiveEditStatus('No lesson selected.', true);
+                return;
+            }
+            studioContentMap[filePath] = currentMarkdownRaw || '';
+            persistStudioState();
+            setLiveEditStatus(`Draft saved: ${filePath}`);
+        }
+
+        async function publishLiveDraft() {
+            syncMarkdownFromLivePreview();
+            const filePath = getCurrentLiveFilePath();
+            if (!filePath) {
+                setLiveEditStatus('No lesson selected.', true);
+                return;
+            }
+            studioContentMap[filePath] = currentMarkdownRaw || '';
+            persistStudioState();
+            const publishResult = await publishStudioToGitHub(filePath, studioContentMap[filePath]);
+            if (publishResult.ok) {
+                setLiveEditStatus('Published to GitHub.');
+            } else if (publishResult.skipped) {
+                setLiveEditStatus(`Local only: ${publishResult.reason}`);
+            } else {
+                setLiveEditStatus(`Publish failed: ${publishResult.reason}`, true);
+            }
+        }
+
+        async function updateLiveEditDockVisibility() {
+            const dock = document.getElementById('live-edit-dock');
+            if (!dock) return;
+            const authCfg = getStudioAuthConfig();
+            let visible = false;
+            if (!authCfg.enabled) {
+                visible = true;
+            } else {
+                const client = getStudioSupabaseClient(authCfg);
+                if (client) {
+                    const sessionResult = await client.auth.getSession();
+                    const sessionUser = sessionResult && sessionResult.data && sessionResult.data.session && sessionResult.data.session.user;
+                    visible = !!(sessionUser && isAllowedStudioUser(sessionUser.email, authCfg.allowedEmail));
+                }
+            }
+            dock.classList.toggle('open', visible);
+            dock.setAttribute('aria-hidden', visible ? 'false' : 'true');
+        }
+
+        function bindLiveEditDockEvents() {
+            const bind = (id, fn) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', fn);
+            };
+            bind('live-add-heading', () => appendToCurrentMarkdown('\n## New Heading\n'));
+            bind('live-add-text', () => appendToCurrentMarkdown('\nNew paragraph text.\n'));
+            bind('live-add-code', () => appendToCurrentMarkdown('\n```js\n// your code\n```\n'));
+            bind('live-add-image', () => {
+                const src = window.prompt('Image URL or path', './ThreejsExamples/Media/image.png');
+                if (!src) return;
+                const alt = window.prompt('Alt text', 'Image') || 'Image';
+                appendToCurrentMarkdown(`\n![${alt}](${src})\n`);
+            });
+            bind('live-add-url', () => {
+                const url = window.prompt('URL', 'https://example.com');
+                if (!url) return;
+                const label = window.prompt('Link label', 'Open Link') || 'Open Link';
+                appendToCurrentMarkdown(`\n[${label}](${url})\n`);
+            });
+            bind('live-add-embed', () => {
+                const url = window.prompt('URL to link/embed', 'https://example.com');
+                if (!url) return;
+                const size = getStudioVideoEmbedSize();
+                appendToCurrentMarkdown(`\n<iframe src="${url}" width="${size.width}" height="${size.height}" style="border:0;max-width:100%;" loading="lazy" allowfullscreen></iframe>\n`);
+            });
+            bind('live-add-olist', () => appendToCurrentMarkdown('\n1. First item\n2. Second item\n3. Third item\n'));
+            bind('live-add-ulist', () => appendToCurrentMarkdown('\n- First item\n- Second item\n- Third item\n'));
+            bind('live-open-studio', () => {
+                window.location.hash = 'studio';
+            });
+            bind('live-save-draft', () => { saveLiveDraft(); });
+            bind('live-publish', () => { publishLiveDraft(); });
+
+            const toggle = document.getElementById('live-visual-edit');
+            const preview = document.getElementById('preview');
+            if (toggle) {
+                toggle.addEventListener('change', (e) => {
+                    setLiveVisualEditMode(!!e.target.checked);
+                });
+            }
+            if (preview) {
+                preview.addEventListener('input', () => {
+                    if (!liveVisualEditEnabled) return;
+                    clearTimeout(livePreviewSyncTimer);
+                    livePreviewSyncTimer = setTimeout(() => {
+                        syncMarkdownFromLivePreview();
+                    }, 220);
+                });
+            }
+        }
+
         function getAllLessonEntries() {
             const items = [];
-            (appConfig.markdownFiles || []).forEach((group, groupIndex) => {
+            sortGroups(appConfig.markdownFiles || []).forEach((group, groupIndex) => {
                 const gp = group.path ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path) : '';
                 sortLessonFiles(group.files || []).forEach((file, fileIndex) => {
                     items.push({
@@ -4872,6 +5144,7 @@ container.setAttribute('aria-hidden', 'false');
             if (!studioSelectedPath) {
                 populateGroupNameSelect('');
                 setVal('studio-group-path', '');
+                setVal('studio-group-sequence', '');
                 setVal('studio-file-name', '');
                 setVal('studio-display-name', '');
                 setVal('studio-sequence', '');
@@ -4887,6 +5160,7 @@ container.setAttribute('aria-hidden', 'false');
 
             populateGroupNameSelect(entry.group.group);
             setVal('studio-group-path', entry.group.path || '');
+            setVal('studio-group-sequence', Number.isFinite(Number(entry.group.sequence)) ? String(entry.group.sequence) : '');
             setVal('studio-file-name', entry.file.fileName);
             setVal('studio-display-name', entry.file.displayName);
             setVal('studio-sequence', Number.isFinite(Number(entry.file.sequence)) ? String(entry.file.sequence) : '');
@@ -4928,6 +5202,7 @@ container.setAttribute('aria-hidden', 'false');
 
             const groupName = getStudioGroupNameValue() || 'New Group';
             const groupPath = normalizeGroupPath(read('studio-group-path'));
+            const groupSequenceRaw = read('studio-group-sequence');
             const fileName = read('studio-file-name');
             const displayName = read('studio-display-name') || fileName;
             const sequenceRaw = read('studio-sequence');
@@ -4944,6 +5219,12 @@ container.setAttribute('aria-hidden', 'false');
             if (oldPath) removeLessonByPath(oldPath);
 
             const group = getOrCreateGroup(groupName, groupPath);
+            const groupSequence = Number.parseInt(groupSequenceRaw, 10);
+            if (Number.isFinite(groupSequence) && groupSequence >= 0) {
+                group.sequence = groupSequence;
+            } else {
+                delete group.sequence;
+            }
             const lesson = { fileName, displayName };
             const sequence = Number.parseInt(sequenceRaw, 10);
             if (Number.isFinite(sequence) && sequence >= 0) {
@@ -5066,6 +5347,7 @@ container.setAttribute('aria-hidden', 'false');
                         history.replaceState({}, '', base);
                     }
                     closeStudioPage();
+                    updateLiveEditDockVisibility();
                     return;
                 }
                 studioPopulateGeneralFields();
@@ -5075,6 +5357,7 @@ container.setAttribute('aria-hidden', 'false');
             } else {
                 closeStudioPage();
             }
+            updateLiveEditDockVisibility();
         }
 
         function studioBindEvents() {
@@ -5346,15 +5629,18 @@ container.setAttribute('aria-hidden', 'false');
         function initStudioUi() {
             if (!studioInitialized) {
                 studioBindEvents();
+                bindLiveEditDockEvents();
                 studioInitialized = true;
             }
             // Default Studio editing mode: Visual Edit ON.
             setStudioVisualEditMode(true);
+            setLiveVisualEditMode(false);
             populateGroupNameSelect(getStudioGroupNameValue());
             studioPopulateGeneralFields();
             studioPopulateLessonSelect(studioSelectedPath || getSavedLastFile() || '');
             setProjectSettingsCollapsed(getStoredBool(PROJECT_SETTINGS_COLLAPSED_KEY, true));
             syncStudioRouteState();
+            updateLiveEditDockVisibility();
         }
 
         loadConfig();
