@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-cpp.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Highlight.js Theme for Code Highlighting -->
@@ -380,22 +381,22 @@
             top: 8px;
             right: 8px;
             z-index: 2;
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            border: 1px solid rgba(148,163,184,0.42);
-            background: rgba(15,23,42,0.86);
-            color: #e2e8f0;
-            font-size: 14px;
+            width: auto;
+            height: auto;
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            font-size: 16px;
             line-height: 1;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            padding: 2px;
         }
 
         .code-copy-btn:hover {
-            border-color: rgba(168,85,247,0.8);
+            color: #ffffff;
         }
 
         .token.comment,
@@ -4026,14 +4027,15 @@ container.setAttribute('aria-hidden', 'false');
                 btn.className = 'code-copy-btn';
                 btn.title = 'Copy code';
                 btn.setAttribute('aria-label', 'Copy code');
-                btn.textContent = '⧉';
+                const iconHtml = '<i class="fa-regular fa-copy" aria-hidden="true"></i>';
+                btn.innerHTML = iconHtml;
                 btn.addEventListener('click', async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     const ok = await copyTextToClipboard(code.innerText || code.textContent || '');
-                    const original = btn.textContent;
+                    const original = btn.innerHTML;
                     btn.textContent = ok ? '✓' : '!';
-                    setTimeout(() => { btn.textContent = original; }, 900);
+                    setTimeout(() => { btn.innerHTML = original || iconHtml; }, 900);
                 });
                 pre.appendChild(btn);
             });
