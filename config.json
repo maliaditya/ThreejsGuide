@@ -18,16 +18,15 @@
     "apiUrl": "/api/github/publish"
   },
   "mediaPath": "/ThreejsExamples/Media",
-  "default_markdown":"Contents",
+  "default_markdown": "Contents",
   "markdownFiles": [
-     {
+    {
       "group": "THREE.js Guide",
       "path": "./ThreejsExamples/index/docs/",
       "files": [
         {
           "fileName": "index.md",
           "displayName": "Contents"
-        
         }
       ]
     },
@@ -35,11 +34,11 @@
       "group": "Chapter 01 -Basics",
       "path": "./ThreejsExamples/01-Basics/docs/",
       "files": [
-         {
+        {
           "fileName": "Environment Setup.md",
           "displayName": "00. Environment Setup"
         },
-         {
+        {
           "fileName": "Triangle.md",
           "displayName": "01. RGB-Triangle",
           "starterRepo": "",
@@ -52,7 +51,20 @@
           "finalRepo": ""
         }
       ]
+    },
+    {
+      "group": "Chapter 01 -Basics",
+      "path": "./ThreejsExamples/Chapter-01-Basics/docs/",
+      "files": [
+        {
+          "fileName": "shadows.md",
+          "displayName": "Shadows"
+        },
+        {
+          "fileName": "lights.md",
+          "displayName": "Lights"
+        }
+      ]
     }
-   
   ]
-} 
+}
