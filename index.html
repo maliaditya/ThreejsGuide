@@ -2822,6 +2822,10 @@
                                 <input id="studio-display-name" type="text">
                             </div>
                             <div class="studio-field">
+                                <label for="studio-sequence">Lesson Sequence</label>
+                                <input id="studio-sequence" type="number" min="0" step="1" placeholder="1">
+                            </div>
+                            <div class="studio-field">
                                 <label for="studio-starter-link">Starter Repo Link</label>
                                 <input id="studio-starter-link" type="text">
                             </div>
@@ -3208,7 +3212,7 @@
                 const gp = group.path
                     ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path)
                     : '';
-                for (const f of (group.files || [])) {
+                for (const f of sortLessonFiles(group.files || [])) {
                     files.push(gp ? `${gp}/${f.fileName}` : f.fileName);
                 }
             }
@@ -3313,6 +3317,27 @@
             const gp = groupPath.endsWith('/') ? groupPath.slice(0, -1) : groupPath;
             const fn = fileName.startsWith('/') ? fileName.slice(1) : fileName;
             return gp + '/' + fn;
+        }
+
+        function getLessonSequenceValue(file) {
+            if (file && Number.isFinite(Number(file.sequence))) {
+                return Number(file.sequence);
+            }
+            const name = (file && file.displayName ? String(file.displayName) : '').trim();
+            const m = name.match(/^(\d+)[\s.\-_:)]*/);
+            if (m) return Number(m[1]);
+            return Number.POSITIVE_INFINITY;
+        }
+
+        function sortLessonFiles(files) {
+            return (files || []).slice().sort((a, b) => {
+                const sa = getLessonSequenceValue(a);
+                const sb = getLessonSequenceValue(b);
+                if (sa !== sb) return sa - sb;
+                const da = String((a && (a.displayName || a.fileName)) || '');
+                const db = String((b && (b.displayName || b.fileName)) || '');
+                return da.localeCompare(db, undefined, { numeric: true, sensitivity: 'base' });
+            });
         }
 
         function buildFileListItem(file, groupPath = '') {
@@ -3571,7 +3596,7 @@ container.setAttribute('aria-hidden', 'false');
                     groupContents.className = 'guide-group-contents';
                     const ul = document.createElement('ul');
 
-                    (group.files || []).forEach(file => {
+                    sortLessonFiles(group.files || []).forEach(file => {
                         ul.appendChild(buildFileListItem(file, group.path || ''));
                     });
 
@@ -4674,7 +4699,7 @@ container.setAttribute('aria-hidden', 'false');
             const items = [];
             (appConfig.markdownFiles || []).forEach((group, groupIndex) => {
                 const gp = group.path ? (group.path.endsWith('/') ? group.path.slice(0, -1) : group.path) : '';
-                (group.files || []).forEach((file, fileIndex) => {
+                sortLessonFiles(group.files || []).forEach((file, fileIndex) => {
                     items.push({
                         groupIndex,
                         fileIndex,
@@ -4849,6 +4874,7 @@ container.setAttribute('aria-hidden', 'false');
                 setVal('studio-group-path', '');
                 setVal('studio-file-name', '');
                 setVal('studio-display-name', '');
+                setVal('studio-sequence', '');
                 setVal('studio-starter-link', '');
                 setVal('studio-final-link', '');
                 setVal('studio-markdown-editor', '');
@@ -4863,6 +4889,7 @@ container.setAttribute('aria-hidden', 'false');
             setVal('studio-group-path', entry.group.path || '');
             setVal('studio-file-name', entry.file.fileName);
             setVal('studio-display-name', entry.file.displayName);
+            setVal('studio-sequence', Number.isFinite(Number(entry.file.sequence)) ? String(entry.file.sequence) : '');
             setVal('studio-starter-link', entry.file.starterRepo || entry.file.starter || '');
             setVal('studio-final-link', entry.file.finalRepo || entry.file.final || '');
 
@@ -4903,6 +4930,7 @@ container.setAttribute('aria-hidden', 'false');
             const groupPath = normalizeGroupPath(read('studio-group-path'));
             const fileName = read('studio-file-name');
             const displayName = read('studio-display-name') || fileName;
+            const sequenceRaw = read('studio-sequence');
             const starterRepo = read('studio-starter-link');
             const finalRepo = read('studio-final-link');
             const markdown = (document.getElementById('studio-markdown-editor') || {}).value || '';
@@ -4917,6 +4945,10 @@ container.setAttribute('aria-hidden', 'false');
 
             const group = getOrCreateGroup(groupName, groupPath);
             const lesson = { fileName, displayName };
+            const sequence = Number.parseInt(sequenceRaw, 10);
+            if (Number.isFinite(sequence) && sequence >= 0) {
+                lesson.sequence = sequence;
+            }
             if (starterRepo) lesson.starterRepo = starterRepo;
             if (finalRepo) lesson.finalRepo = finalRepo;
             group.files.push(lesson);
