@@ -26,29 +26,14 @@
       "sequence": 1,
       "files": [
         {
-          "fileName": "rgb-triangle.md",
-          "displayName": "01. RGB-Triangle",
-          "sequence": 1
-        },
-        {
           "fileName": "computer-fundamentals.md",
-          "displayName": "03. Computer Fundamentals",
-          "sequence": 2
-        },
-        {
-          "fileName": "lights.md",
-          "displayName": "Lights",
-          "sequence": 3
-        },
-        {
-          "fileName": "shadows.md",
-          "displayName": "Shadows",
-          "sequence": 4
+          "displayName": "00. Computer Fundamentals",
+          "sequence": 0
         },
         {
           "fileName": "environment-setup.md",
-          "displayName": "00. Environment Setup",
-          "sequence": 0
+          "displayName": "01. Environment Setup",
+          "sequence": 1
         }
       ]
     },
