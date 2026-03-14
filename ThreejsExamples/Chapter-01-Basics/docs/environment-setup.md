@@ -1,6 +1,9 @@
-# Web Runtime Environment 
----
-![[Pasted image 20260101233752.png]]
+# Web Runtime Environment
+
+* * *
+
+![](/ThreejsExamples/Media/Pasted%20image%2020260101233752.png)
+
 ## **Project Initialization (npm + Vite)**
 
 ### Create a new folder
@@ -10,7 +13,7 @@ mkdir setup
 cd setup
 ```
 
----
+* * *
 
 ### Initialize npm
 
@@ -20,11 +23,11 @@ npm init -y
 
 What this does:
 
-* Creates `package.json`
-* Enables dependency management
-* Marks this folder as a JS project
+*   Creates `package.json`
+*   Enables dependency management
+*   Marks this folder as a JS project
 
----
+* * *
 
 ### Install Vite
 
@@ -34,11 +37,11 @@ npm install vite --save-dev
 
 What this does:
 
-* Adds Vite as a **development tool**
-* No global install needed
-* Keeps setup portable
+*   Adds Vite as a **development tool**
+*   No global install needed
+*   Keeps setup portable
 
----
+* * *
 
 ### Add dev script
 
@@ -58,12 +61,9 @@ Now you can start the server with:
 npm run dev
 ```
 
----
+* * *
 
-
-
-
-## 1. **Vite Runtime Setup**
+## 1\. **Vite Runtime Setup**
 
 **`vite.config.js`**
 
@@ -77,13 +77,13 @@ export default defineConfig({
 })
 ```
 
-* Starts a dev server
-* Handles ES module loading
-* Opens the browser automatically
+*   Starts a dev server
+*   Handles ES module loading
+*   Opens the browser automatically
 
----
+* * *
 
-## 2. **HTML Structure**
+## 2\. **HTML Structure**
 
 **`index.html`**
 
@@ -119,16 +119,16 @@ export default defineConfig({
 
 What this does:
 
-* Creates a full-screen page
-* Provides a `<canvas>` as a rendering surface
-* Loads JavaScript as an ES module
+*   Creates a full-screen page
+*   Provides a `<canvas>` as a rendering surface
+*   Loads JavaScript as an ES module
 
----
+* * *
 
-## 3. **JavaScript Runtime State & Resize Handling**
-
+## 3\. **JavaScript Runtime State & Resize Handling**
 
 ### Viewport state (single source of truth)
+
 **`script.js`**
 
 ```js
@@ -139,25 +139,29 @@ const viewport = {
 }
 ```
 
-* Mirrors the current browser window
-* Stores pixel ratio explicitly
-* Prevents querying `window` everywhere
+*   Mirrors the current browser window
+*   Stores pixel ratio explicitly
+*   Prevents querying `window` everywhere
 
----
+* * *
 
 ### Canvas reference
+
 **`script.js`**
+
 ```js
 const canvas = document.getElementById('app')
 ```
 
-* Direct reference to the DOM canvas
-* Used as the drawing surface
+*   Direct reference to the DOM canvas
+*   Used as the drawing surface
 
----
+* * *
 
 ### Apply viewport values to canvas
+
 **`script.js`**
+
 ```js
 function applyViewportState() {
   canvas.width  = viewport.width  * viewport.pixelRatio
@@ -170,14 +174,16 @@ function applyViewportState() {
 
 What this does:
 
-* Sets **internal resolution** (sharpness)
-* Sets **CSS size** (layout)
-* Keeps canvas crisp on high-DPI screens
+*   Sets **internal resolution** (sharpness)
+*   Sets **CSS size** (layout)
+*   Keeps canvas crisp on high-DPI screens
 
----
+* * *
 
 ### Window resize handling
+
 **`script.js`**
+
 ```js
 window.addEventListener('resize', () => {
   viewport.width = window.innerWidth
@@ -188,10 +194,10 @@ window.addEventListener('resize', () => {
 })
 ```
 
-* Updates stored window values
-* Reapplies canvas sizing whenever the window changes
+*   Updates stored window values
+*   Reapplies canvas sizing whenever the window changes
 
----
+* * *
 
 ### Initial setup call
 
@@ -199,16 +205,16 @@ window.addEventListener('resize', () => {
 applyViewportState()
 ```
 
-* Ensures canvas matches the window on first load
-* Prevents mismatched size on startup
+*   Ensures canvas matches the window on first load
+*   Prevents mismatched size on startup
 
----
+* * *
 
 ### Project structure
 
 Your final folder layout:
 
-```
+```lua
 web-runtime/
 ├─ index.html
 ├─ script.js
@@ -217,25 +223,18 @@ web-runtime/
 └─ node_modules/
 ```
 
----
+* * *
 
 ## Summary (Plain Language)
 
-* **Vite** loads and serves the app
-* **HTML** defines a full-screen canvas
-* **JavaScript**:
-
-  * Tracks window size
-  * Handles high-DPI displays
-  * Keeps the canvas in sync with the browser
-
-
-
-
-
-
-
-
-
-
-
+*   **Vite** loads and serves the app
+    
+*   **HTML** defines a full-screen canvas
+    
+*   **JavaScript**:
+    
+*   Tracks window size
+    
+*   Handles high-DPI displays
+    
+*   Keeps the canvas in sync with the browser
